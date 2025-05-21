@@ -10,9 +10,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
-@PageTitle("Registrar")
+@PageTitle("Registrar Medicina")
 @Route("")
-@Menu(order = 1, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@Menu(order = 0, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class RegistrarView extends HorizontalLayout {
 
     private TextField name;

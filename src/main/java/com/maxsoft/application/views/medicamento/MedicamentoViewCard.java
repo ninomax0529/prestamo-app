@@ -22,6 +22,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 public class MedicamentoViewCard extends ListItem {
 
     public MedicamentoViewCard(String text, String url) {
+        
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE);
 
