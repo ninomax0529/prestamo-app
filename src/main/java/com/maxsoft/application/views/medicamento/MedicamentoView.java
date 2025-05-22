@@ -1,5 +1,7 @@
 package com.maxsoft.application.views.medicamento;
 
+import com.maxsoft.application.modelo.Medicamento;
+import com.maxsoft.application.repo.MedicamentoRepo;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.H2;
@@ -22,6 +24,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Medicamento")
@@ -30,17 +34,23 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 public class MedicamentoView extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
+    @Autowired
+    MedicamentoRepo mediRepo;
 
-    public MedicamentoView() {
+    public MedicamentoView(MedicamentoRepo mediRepoArg) {
         constructUI();
 
-        imageContainer.add(new MedicamentoViewCard("Snow mountains under stars",
-                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new MedicamentoViewCard("Snow covered mountain",
-                "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new MedicamentoViewCard("River between mountains",
-                "https://images.unsplash.com/photo-1536048810607-3dc7f86981cb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80"));
-        
+        this.mediRepo = mediRepoArg;
+
+        crearTarjeta();
+//        
+//        imageContainer.add(new MedicamentoViewCard("Snow mountains under stars",
+//                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
+//        imageContainer.add(new MedicamentoViewCard("Snow covered mountain",
+//                "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
+//        imageContainer.add(new MedicamentoViewCard("River between mountains",
+//                "https://images.unsplash.com/photo-1536048810607-3dc7f86981cb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80"));
+//        
 //        imageContainer.add(new MedicamentoViewCard("Milky way on mountains",
 //                "https://images.unsplash.com/photo-1515705576963-95cad62945b6?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=750&q=80"));
 //        imageContainer.add(new MedicamentoViewCard("Mountain with fog",
@@ -51,7 +61,7 @@ public class MedicamentoView extends Main implements HasComponents, HasStyle {
     }
 
     private void constructUI() {
-        
+
         addClassNames("medicamento-view");
         addClassNames(MaxWidth.SCREEN_LARGE, Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
 
@@ -59,22 +69,33 @@ public class MedicamentoView extends Main implements HasComponents, HasStyle {
         container.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
 
         VerticalLayout headerContainer = new VerticalLayout();
-        H2 header = new H2("Beautiful photos");
+        H2 header = new H2("Tratamientos de medicamentos");
         header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
         Paragraph description = new Paragraph("Royalty free photos and pictures, courtesy of Unsplash");
         description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
-
-        Select<String> sortBy = new Select<>();
-        sortBy.setLabel("Sort by");
-        sortBy.setItems("Popularity", "Newest first", "Oldest first");
-        sortBy.setValue("Popularity");
+//
+//        Select<String> sortBy = new Select<>();
+//        sortBy.setLabel("Sort by");
+//        sortBy.setItems("Popularity", "Newest first", "Oldest first");
+//        sortBy.setValue("Popularity");
 
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);
 
-        container.add(headerContainer, sortBy);
+        container.add(headerContainer);
         add(container, imageContainer);
+
+    }
+
+    private void crearTarjeta() {
+
+        List<Medicamento> lista = this.mediRepo.findAll();
+        
+        for (Medicamento med : lista) {
+             imageContainer.add(new MedicamentoViewCard(med));
+        }
+       
 
     }
 }
