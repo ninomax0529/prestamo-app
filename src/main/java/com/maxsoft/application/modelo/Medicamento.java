@@ -47,6 +47,9 @@ public class Medicamento implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "nombre")
     private String nombre;
+    @Size(min = 1, max = 45)
+    @Column(name = "hora")
+    private String hora;
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_compra")
@@ -154,6 +157,20 @@ public class Medicamento implements Serializable {
         this.tipoMedicamento = tipoMedicamento;
     }
 
+    /**
+     * @return the hora
+     */
+    public String getHora() {
+        return hora;
+    }
+
+    /**
+     * @param hora the hora to set
+     */
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -178,5 +195,5 @@ public class Medicamento implements Serializable {
     public String toString() {
         return "com.maxsoft.application.modelo.Medicamento[ codigo=" + codigo + " ]";
     }
-    
+
 }

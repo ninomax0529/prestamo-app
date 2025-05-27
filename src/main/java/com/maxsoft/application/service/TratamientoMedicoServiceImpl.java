@@ -40,4 +40,10 @@ public class TratamientoMedicoServiceImpl implements TratamientoMedicoService {
         return lista;
     }
 
+    @Override
+    public void eliminar(TratamientoMedico obj) {
+
+        repo.delete(obj);
+    }
+
 }

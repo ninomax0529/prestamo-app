@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.example.vaadinapp.util;
+package com.maxsoft.application.util;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -256,7 +256,7 @@ public class ClaseUtil {
     }
 
     public static LocalTime getHora() {
-        
+
         LocalDateTime fechaHora = LocalDateTime.now(); // Ejemplo: 2025-05-14T15:45:30
 
         // Opción 1: Obtener un LocalTime (hora completa)
@@ -271,10 +271,9 @@ public class ClaseUtil {
         System.out.println("Hora: " + horas);
         System.out.println("Minuto: " + minutos);
         System.out.println("Segundo: " + segundos);
-    
-        return hora;
-}
 
+        return hora;
+    }
 
     public static void main(String[] args) {
 

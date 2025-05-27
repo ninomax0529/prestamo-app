@@ -1,11 +1,25 @@
 package com.maxsoft.application.views.medicamento;
 
 import com.maxsoft.application.modelo.Medicamento;
+import com.maxsoft.application.modelo.TratamientoMedico;
+import com.maxsoft.application.repo.MedicamentoRepo;
+import com.maxsoft.application.service.TratamientoMedicoService;
+import com.maxsoft.application.util.ClaseUtil;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
@@ -21,8 +35,13 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import java.io.ByteArrayInputStream;
+import java.time.LocalTime;
+import java.util.Date;
 
 public class MedicamentoViewCard extends ListItem {
+
+    private final TratamientoMedicoService tratamientoService = null;
+    private final MedicamentoRepo medicamentoRepo = null;
 
     public MedicamentoViewCard(String text, String url) {
 
@@ -62,7 +81,7 @@ public class MedicamentoViewCard extends ListItem {
 
     }
 
-    public MedicamentoViewCard(Medicamento medic) {
+    public MedicamentoViewCard(Medicamento medic, TratamientoMedicoService tratamientoService, MedicamentoRepo mediRepoArg) {
 
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE);
@@ -74,8 +93,44 @@ public class MedicamentoViewCard extends ListItem {
         div.setHeight("160px");
 
         Image imagen;
-        
-        
+
+        HorizontalLayout hlBotones = new HorizontalLayout();
+//        Button btnRegistrar = new Button("Registrar");
+       
+
+        Button btnVerRegistro = new Button("Ver Registro", e -> {
+            
+          UI.getCurrent().navigate("TratamientoMedico/"+medic.getCodigo());
+     
+        } );
+
+        Button btnRegistrar = new Button("Registrar", event -> {
+
+            ConfirmDialo dialog = new ConfirmDialo(
+                    "¿Estás seguro de que deseas registrar esta pastilla?",
+                    () -> {
+
+                        guardar(medic, tratamientoService);
+
+                        Notification.show("Pastilla Registrada exitosamente", 3000, Notification.Position.MIDDLE);
+
+                        medic.setFechaCreacion(new Date());
+                        medic.setHora(ClaseUtil.getFormatoHora(new Date()));
+                        mediRepoArg.save(medic);
+
+                        // Acción al confirmar
+//                    System.out.println("Elemento eliminado");
+                    },
+                    () -> {
+                        // Acción al cancelar (opcional)
+//                        Notification.show("Accion Cancelada", 3000, Notification.Position.MIDDLE);
+                    }
+            );
+            dialog.open();
+        });
+
+        hlBotones.add(btnRegistrar, btnVerRegistro);
+
         StreamResource resource = new StreamResource(
                 "imagen", // nombre lógico
                 () -> new ByteArrayInputStream(medic.getImagen()) // input stream
@@ -84,7 +139,6 @@ public class MedicamentoViewCard extends ListItem {
 //        imagen.setHeight("80px");
 //        imagen.setWidth("80px");
 
-        
         imagen.setWidth("100%");
 //        image.set
         imagen.setAlt("Medicamento");
@@ -93,20 +147,59 @@ public class MedicamentoViewCard extends ListItem {
 
         Span header = new Span();
         header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
-        header.setText(medic.getNombre());
+        header.setText("Fecha Ultima bebida ");
 
         Span subtitle = new Span();
         subtitle.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
-        subtitle.setText("Pastilla");
 
-        Paragraph description = new Paragraph(medic.getNota());
-        description.addClassName(Margin.Vertical.MEDIUM);
+        H3 fecha = new H3(medic.getHora());
+        fecha.setText(medic.getFechaCreacion().toString());
 
-        Span badge = new Span();
-        badge.getElement().setAttribute("theme", "badge");
-        badge.setText("Label");
+        H3 h3 = new H3("Hora Ultima bebida");
+        H3 hora = new H3(medic.getHora());
+        h3.addClassName(Margin.Vertical.MEDIUM);
 
-        add(div, header, subtitle, description, badge);
+//        Span badge = new Span();
+//        badge.getElement().setAttribute("theme", "badge");
+//        badge.setText("Label");
+        add(hlBotones, div, header, fecha, h3, hora);
 
+    }
+
+    private void guardar(Medicamento medic, TratamientoMedicoService tratService) {
+
+        TratamientoMedico t = new TratamientoMedico();
+        t.setNombreMedicamento(medic.getNombre());
+//            t.setMedicamento(seleccionado); // ID manual si necesario
+        t.setMedicamento(medic); // Objeto relacionado
+
+        LocalTime lt = ClaseUtil.getHora();
+
+        t.setFechaBebida(new Date());
+        t.setHoraBebida(new Date());
+        t.setHora(lt.getHour() + ":" + lt.getMinute());
+
+        String dia = ClaseUtil.getNombreDia(new Date());
+        String mes = ClaseUtil.getNombreMes(new Date());
+
+        t.setDia(dia);
+        t.setMes(mes);
+        int anio = ClaseUtil.getAno(new Date());
+        t.setAnio(Integer.toString(anio));
+
+        tratService.guardar(t);
+
+//            actualizarGrid();
+    }
+
+    // Método auxiliar para crear un RouterLink con icono y texto
+    private RouterLink createLink(VaadinIcon icon, String text, Class<? extends Component> navigationTarget) {
+        Icon linkIcon = icon.create();
+        linkIcon.getStyle().set("marginRight", "10px");
+        RouterLink link = new RouterLink();
+        link.add(linkIcon, new Span(text));
+        link.setRoute(navigationTarget);
+//        link.setHighlightCondition(HighlightCondition.sameLocation());
+        return link;
     }
 }

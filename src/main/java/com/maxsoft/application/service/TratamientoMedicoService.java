@@ -4,7 +4,6 @@
  */
 package com.maxsoft.application.service;
 
-
 import com.maxsoft.application.modelo.TratamientoMedico;
 import java.util.List;
 
@@ -15,6 +14,8 @@ import java.util.List;
 public interface TratamientoMedicoService {
 
     public TratamientoMedico guardar(TratamientoMedico obj);
+
+    public void eliminar(TratamientoMedico obj);
 
     public List<TratamientoMedico> getLista();
 
