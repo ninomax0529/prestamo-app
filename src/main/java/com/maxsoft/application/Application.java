@@ -18,5 +18,16 @@ public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+
+        Runtime runtime = Runtime.getRuntime();
+        long maxMemory = runtime.maxMemory();
+        long allocatedMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+
+        System.out.println("Max Memory: " + maxMemory / 1024 / 1024 + " MB");
+        System.out.println("Allocated Memory: " + allocatedMemory / 1024 / 1024 + " MB");
+        System.out.println("Free Memory in allocated: " + freeMemory / 1024 / 1024 + " MB");
+        System.out.println("Used Memory: " + (allocatedMemory - freeMemory) / 1024 / 1024 + " MB");
+
     }
 }
