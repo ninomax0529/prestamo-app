@@ -69,8 +69,9 @@ public class Medicamento implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Lob
-    @Column(name = "imagen")
+    @Column(name = "imagen", columnDefinition = "LONGBLOB")
     private byte[] imagen;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medicamento")
     private Collection<TratamientoMedico> tratamientoMedicoCollection;
     @JoinColumn(name = "tipo_medicamento", referencedColumnName = "codigo")
