@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Registrar Bebidas")
-@Route("RegistrarBebida")
+@Route("")
 @Menu(order = 0, icon = LineAwesomeIconUrl.TH_LIST_SOLID)
 public class MedicamentoView extends Main implements HasComponents, HasStyle {
 
