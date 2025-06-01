@@ -14,12 +14,24 @@ import org.springframework.data.repository.query.Param;
  *
  * @author maximilianoalmonte
  */
-public interface TratamientoMedicoRepo extends JpaRepository<TratamientoMedico, Integer>{
-    
-    
-     
+public interface TratamientoMedicoRepo extends JpaRepository<TratamientoMedico, Integer> {
+
     String strDet = "  select * from  tratamiento_medico o where medicamento=:obj ";
 
     @Query(value = strDet, nativeQuery = true)
     public List<TratamientoMedico> getHistorial(@Param("obj") int op);
+
+    String strActivo = "  select * from  tratamiento_medico o "
+            + " where historial=false and "
+            + " medicamento=:obj ";
+
+    @Query(value = strActivo, nativeQuery = true)
+    public List<TratamientoMedico> getListaActiva(@Param("obj") int op);
+
+    String strCant = "  select count(*) from  tratamiento_medico o "
+            + "  where historial=false and "
+            + "  medicamento=:obj ";
+
+    @Query(value = strCant, nativeQuery = true)
+    public Integer getCantidadBebida(@Param("obj") int op);
 }

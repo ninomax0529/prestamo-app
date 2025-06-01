@@ -136,7 +136,7 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
 
         codMedi = Integer.valueOf(t);
 
-        tratamientos = this.tratamientoService.getHistorial(codMedi);
+        tratamientos = this.tratamientoService.getListaActiva(codMedi);
         gridDetalle.setItems(tratamientos);
     }
 

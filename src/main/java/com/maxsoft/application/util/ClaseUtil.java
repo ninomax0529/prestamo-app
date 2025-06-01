@@ -29,6 +29,7 @@ public class ClaseUtil {
 
     private static SimpleDateFormat sdfH = new SimpleDateFormat("HH:mm");
     private static SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+       private static SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
     private static DecimalFormat df = new DecimalFormat("###,###,###.00");
 
     public ClaseUtil() {
@@ -48,6 +49,11 @@ public class ClaseUtil {
     public static String formatoFecha(Date fecha) {
 
         return sdf2.format(fecha);
+
+    }
+      public static String formatoFechaLocal(Date fecha) {
+
+        return sdf3.format(fecha);
 
     }
 

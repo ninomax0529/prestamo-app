@@ -20,5 +20,8 @@ public interface TratamientoMedicoService {
     public List<TratamientoMedico> getLista();
 
     public List<TratamientoMedico> getHistorial(int op);
+    public List<TratamientoMedico> getListaActiva(int op);
+    
+     public Integer getCantidadBebida(int op);
 
 }

@@ -6,6 +6,8 @@ import com.maxsoft.application.service.TratamientoMedicoService;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.OrderedList;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -57,8 +59,8 @@ public class MedicamentoView extends Main implements HasComponents, HasStyle {
         container.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
 
         VerticalLayout headerContainer = new VerticalLayout();
-        H2 header = new H2("Registro Bebida de Medicamentos");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        H3 header = new H3("Registro Bebida de Medicamentos");
+//        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
 
         headerContainer.add(header);
 
@@ -74,8 +76,20 @@ public class MedicamentoView extends Main implements HasComponents, HasStyle {
 
         List<Medicamento> lista = this.mediRepo.findAll();
 
+        Integer canBebida , existencia ;
+        
         for (Medicamento med : lista) {
-            imageContainer.add(new MedicamentoViewCard(med, this.tratamientoService,mediRepo));
+
+            canBebida = this.tratamientoService.getCantidadBebida(med.getCodigo());
+            existencia = med.getCantidadComprada() - canBebida;
+            med.setCantidadBebida(canBebida);
+            med.setExistencia(existencia);
+//            
+//            if(existencia==0){
+//                this.tratamientoService.guardar(obj);
+//            }
+//            
+            imageContainer.add(new MedicamentoViewCard(med, this.tratamientoService, mediRepo));
         }
 
     }

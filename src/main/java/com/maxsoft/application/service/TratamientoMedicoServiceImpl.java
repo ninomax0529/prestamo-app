@@ -46,4 +46,19 @@ public class TratamientoMedicoServiceImpl implements TratamientoMedicoService {
         repo.delete(obj);
     }
 
+    @Override
+    public Integer getCantidadBebida(int op) {
+
+        return repo.getCantidadBebida(op);
+    }
+
+    @Override
+    public List<TratamientoMedico> getListaActiva(int op) {
+
+        List<TratamientoMedico> lista = null;
+        lista = repo.getListaActiva(op);
+//        
+        return lista;
+    }
+
 }

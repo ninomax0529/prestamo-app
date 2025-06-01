@@ -47,9 +47,6 @@ public class Medicamento implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "nombre")
     private String nombre;
-    @Size(min = 1, max = 45)
-    @Column(name = "hora")
-    private String hora;
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_compra")
@@ -66,12 +63,26 @@ public class Medicamento implements Serializable {
     @Size(min = 1, max = 65535)
     @Column(name = "nota")
     private String nota;
+    @Size(max = 45)
+    @Column(name = "hora")
+    private String hora;
     @Basic(optional = false)
     @NotNull
     @Lob
     @Column(name = "imagen", columnDefinition = "LONGBLOB")
     private byte[] imagen;
-
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "cantidad_comprada")
+    private int cantidadComprada;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "existencia")
+    private int existencia;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "cantidad_bebida")
+    private int cantidadBebida;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medicamento")
     private Collection<TratamientoMedico> tratamientoMedicoCollection;
     @JoinColumn(name = "tipo_medicamento", referencedColumnName = "codigo")
@@ -85,13 +96,16 @@ public class Medicamento implements Serializable {
         this.codigo = codigo;
     }
 
-    public Medicamento(Integer codigo, String nombre, Date fechaCompra, Date fechaCreacion, String nota, byte[] imagen) {
+    public Medicamento(Integer codigo, String nombre, Date fechaCompra, Date fechaCreacion, String nota, byte[] imagen, int cantidadComprada, int existencia, int cantidadBebida) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.fechaCompra = fechaCompra;
         this.fechaCreacion = fechaCreacion;
         this.nota = nota;
         this.imagen = imagen;
+        this.cantidadComprada = cantidadComprada;
+        this.existencia = existencia;
+        this.cantidadBebida = cantidadBebida;
     }
 
     public Integer getCodigo() {
@@ -134,12 +148,44 @@ public class Medicamento implements Serializable {
         this.nota = nota;
     }
 
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
     public byte[] getImagen() {
         return imagen;
     }
 
     public void setImagen(byte[] imagen) {
         this.imagen = imagen;
+    }
+
+    public int getCantidadComprada() {
+        return cantidadComprada;
+    }
+
+    public void setCantidadComprada(int cantidadComprada) {
+        this.cantidadComprada = cantidadComprada;
+    }
+
+    public int getExistencia() {
+        return existencia;
+    }
+
+    public void setExistencia(int existencia) {
+        this.existencia = existencia;
+    }
+
+    public int getCantidadBebida() {
+        return cantidadBebida;
+    }
+
+    public void setCantidadBebida(int cantidadBebida) {
+        this.cantidadBebida = cantidadBebida;
     }
 
     public Collection<TratamientoMedico> getTratamientoMedicoCollection() {
@@ -156,20 +202,6 @@ public class Medicamento implements Serializable {
 
     public void setTipoMedicamento(TipoMedicamento tipoMedicamento) {
         this.tipoMedicamento = tipoMedicamento;
-    }
-
-    /**
-     * @return the hora
-     */
-    public String getHora() {
-        return hora;
-    }
-
-    /**
-     * @param hora the hora to set
-     */
-    public void setHora(String hora) {
-        this.hora = hora;
     }
 
     @Override

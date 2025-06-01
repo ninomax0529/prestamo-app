@@ -10,6 +10,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
@@ -36,6 +37,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import java.io.ByteArrayInputStream;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 public class MedicamentoViewCard extends ListItem {
 
@@ -89,19 +91,18 @@ public class MedicamentoViewCard extends ListItem {
         div.addClassNames(Background.CONTRAST, Display.FLEX, AlignItems.CENTER, JustifyContent.CENTER,
                 Margin.Bottom.MEDIUM, Overflow.HIDDEN, BorderRadius.MEDIUM, Width.FULL);
 
-        div.setHeight("160px");
+        div.setHeight("260px");
 
         Image imagen;
 
         HorizontalLayout hlBotones = new HorizontalLayout();
 //        Button btnRegistrar = new Button("Registrar");
-       
 
         Button btnVerRegistro = new Button("Ver Registro", e -> {
-            
-          UI.getCurrent().navigate("TratamientoMedico/"+medic.getCodigo());
-     
-        } );
+
+            UI.getCurrent().navigate("TratamientoMedico/" + medic.getCodigo());
+
+        });
 
         Button btnRegistrar = new Button("Registrar", event -> {
 
@@ -128,6 +129,27 @@ public class MedicamentoViewCard extends ListItem {
             dialog.open();
         });
 
+        Integer canBebida =tratamientoService.getCantidadBebida(medic.getCodigo());
+        Integer existencia = medic.getCantidadComprada() - canBebida;
+        medic.setExistencia(existencia);
+        medic.setCantidadBebida(canBebida);
+         mediRepoArg.save(medic);
+
+        if (medic.getExistencia()<=0) {
+            
+            btnRegistrar.setEnabled(false);
+//            
+//            List<TratamientoMedico> lista=tratamientoService.getListaActiva(medic.getCodigo());
+//            
+//            for (TratamientoMedico tra : lista) {
+//                
+//                tra.setHistorial(true);
+//                tratamientoService.guardar(tra);
+//            }
+            
+            
+        }
+        
         hlBotones.add(btnRegistrar, btnVerRegistro);
 
         StreamResource resource = new StreamResource(
@@ -142,26 +164,41 @@ public class MedicamentoViewCard extends ListItem {
 //        image.set
         imagen.setAlt("Medicamento");
 
+        Div separador = new Div();
+        separador.setHeight("2px");
+        separador.setWidth("100%");
+        separador.getStyle()
+                .set("background-color", "#ccc")
+                .set("margin", "10px 0");
+
         div.add(imagen);
 
-        Span header = new Span();
-        header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
-        header.setText("Fecha Ultima bebida ");
+        H4 h3CantidadBebida = new H4("Me he bebido "
+                + medic.getCantidadBebida() + " de " + medic.getCantidadComprada());
+        H4 h3Existencia = new H4("Me quedan " + medic.getExistencia());
+
+        H4 header = new H4();
+//        header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
+        header.setText("Fecha :");
 
         Span subtitle = new Span();
         subtitle.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
 
-        H3 fecha = new H3(medic.getHora());
-        fecha.setText(medic.getFechaCreacion().toString());
+        H4 h3Fecha = new H4(medic.getHora());
+        String fechaStr = ClaseUtil.formatoFechaLocal(medic.getFechaCreacion());
+        h3Fecha.setText(fechaStr);
 
-        H3 h3 = new H3("Hora Ultima bebida");
+        H3 h3 = new H3("Hora : ");
         H3 hora = new H3(medic.getHora());
-        h3.addClassName(Margin.Vertical.MEDIUM);
+//        h3.addClassName(Margin.Vertical.MEDIUM);
+        HorizontalLayout hlFecha = new HorizontalLayout(header, h3Fecha);
+        HorizontalLayout hlHora = new HorizontalLayout(h3, hora);
+        HorizontalLayout hlBebida = new HorizontalLayout(h3CantidadBebida);
 
-//        Span badge = new Span();
-//        badge.getElement().setAttribute("theme", "badge");
-//        badge.setText("Label");
-        add(hlBotones, div, header, fecha, h3, hora);
+        hlFecha.setSpacing(false);
+        hlHora.setSpacing(false);
+
+        add(hlBotones, div, hlFecha, hlHora, separador, hlBebida, h3Existencia);
 
     }
 
@@ -191,14 +228,4 @@ public class MedicamentoViewCard extends ListItem {
 //            actualizarGrid();
     }
 
-    // Método auxiliar para crear un RouterLink con icono y texto
-    private RouterLink createLink(VaadinIcon icon, String text, Class<? extends Component> navigationTarget) {
-        Icon linkIcon = icon.create();
-        linkIcon.getStyle().set("marginRight", "10px");
-        RouterLink link = new RouterLink();
-        link.add(linkIcon, new Span(text));
-        link.setRoute(navigationTarget);
-//        link.setHighlightCondition(HighlightCondition.sameLocation());
-        return link;
-    }
 }

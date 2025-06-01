@@ -69,6 +69,10 @@ public class TratamientoMedico implements Serializable {
     @Size(min = 1, max = 30)
     @Column(name = "hora")
     private String hora;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "historial")
+    private boolean historial;
     @JoinColumn(name = "medicamento", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
     private Medicamento medicamento;
@@ -80,13 +84,14 @@ public class TratamientoMedico implements Serializable {
         this.codigo = codigo;
     }
 
-    public TratamientoMedico(Integer codigo, String nombreMedicamento, Date fechaBebida, String dia, Date horaBebida, String hora) {
+    public TratamientoMedico(Integer codigo, String nombreMedicamento, Date fechaBebida, String dia, Date horaBebida, String hora, boolean historial) {
         this.codigo = codigo;
         this.nombreMedicamento = nombreMedicamento;
         this.fechaBebida = fechaBebida;
         this.dia = dia;
         this.horaBebida = horaBebida;
         this.hora = hora;
+        this.historial = historial;
     }
 
     public Integer getCodigo() {
@@ -151,6 +156,14 @@ public class TratamientoMedico implements Serializable {
 
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public boolean getHistorial() {
+        return historial;
+    }
+
+    public void setHistorial(boolean historial) {
+        this.historial = historial;
     }
 
     public Medicamento getMedicamento() {
