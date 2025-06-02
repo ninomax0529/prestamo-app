@@ -2,8 +2,10 @@ package com.maxsoft.application.views.registrar;
 
 import com.maxsoft.application.modelo.Medicamento;
 import com.maxsoft.application.modelo.TipoMedicamento;
+import com.maxsoft.application.modelo.TratamientoMedico;
 import com.maxsoft.application.repo.MedicamentoRepo;
 import com.maxsoft.application.service.MedicamentoDaoService;
+import com.maxsoft.application.service.TratamientoMedicoService;
 import com.maxsoft.application.util.ClaseUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -28,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
@@ -46,6 +49,8 @@ public class RegistrarView extends VerticalLayout {
     private Button nuevo = new Button("Nuevo");
     @Autowired
     private MedicamentoRepo mediRepo;
+    @Autowired
+    private TratamientoMedicoService tratamientoService;
     Medicamento medicamento;
     MedicamentoDaoService medicamentoDaoService;
     DatePicker dpFecha = new DatePicker("Fecha de Compra");
@@ -55,10 +60,13 @@ public class RegistrarView extends VerticalLayout {
 
     byte[] bytes;
 
-    public RegistrarView(MedicamentoRepo mediRepoArg, MedicamentoDaoService medicamentoDaoArg) {
+    public RegistrarView(MedicamentoRepo mediRepoArg, MedicamentoDaoService medicamentoDaoArg,
+            TratamientoMedicoService tratamientoServiceArg
+    ) {
 
         this.mediRepo = mediRepoArg;
         this.medicamentoDaoService = medicamentoDaoArg;
+        this.tratamientoService = tratamientoServiceArg;
 
         txtNombre = new TextField("Nombre Medicamento");
         txtCantidad = new IntegerField("Cantidad Medicamento");
@@ -125,7 +133,7 @@ public class RegistrarView extends VerticalLayout {
         grid.setSizeFull();
 
         grid.addComponentColumn(medic -> {
-                       
+
             Button editar = new Button("Actualizar", event -> editarMedicamento(medic));
 
             return new HorizontalLayout(editar);
@@ -137,7 +145,7 @@ public class RegistrarView extends VerticalLayout {
     }
 
     private void editarMedicamento(Medicamento medicamento) {
-       
+
         this.medicamento = medicamento;
         bytes = medicamento.getImagen();
         this.medicamentoDaoService.setMedicamento(medicamento);
@@ -170,6 +178,14 @@ public class RegistrarView extends VerticalLayout {
         mediRepo.save(medicamento);
 
         Notification.show("Registro guardado exitosamente ", 2000, Notification.Position.TOP_CENTER);
+
+        List<TratamientoMedico> lista = this.tratamientoService.getListaActiva(medicamento.getCodigo());
+
+        for (TratamientoMedico tra : lista) {
+
+            tra.setHistorial(true);
+            tratamientoService.guardar(tra);
+        }
 //        limpiarFormulario();
         actualizarLista();
 

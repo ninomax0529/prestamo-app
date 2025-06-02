@@ -12,8 +12,11 @@ import com.maxsoft.application.modelo.Medicamento;
 import com.maxsoft.application.modelo.TratamientoMedico;
 import com.maxsoft.application.repo.MedicamentoRepo;
 import com.maxsoft.application.service.TratamientoMedicoService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -45,6 +48,7 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
     TratamientoMedico tratamientoMedico;
 
     Integer codMedi;
+     Button btnVerRegistro ;
 
     @Autowired
     public TratamientoMedicoView(TratamientoMedicoService tratamientoService, MedicamentoRepo medicamentoRepo) {
@@ -58,9 +62,15 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
 
         tabs.setSizeFull();
 
+         btnVerRegistro = new Button("Volver", e -> {
+
+            UI.getCurrent().navigate("/");
+
+        });
+
         tabs.add("HISTORIAL", gridDetalle);
 
-        add(tabs);
+        add(btnVerRegistro,tabs);
 
     }
 
@@ -73,11 +83,11 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
 //                .setHeader("Medicamento")
 //                .setKey("medicamento")
 //                .setFooter("TOTAL :");
-        gridDetalle.addColumn(TratamientoMedico::getFechaBebida).setHeader("Fecha Bebida")
-                .setFooter("TOTAL :");
+        gridDetalle.addColumn(TratamientoMedico::getFechaBebida).setHeader("Fecha")
+                .setFooter("TOTAL:");
 
         gridDetalle.addColumn(TratamientoMedico::getHora)
-                .setHeader("Hora Bebida")
+                .setHeader("Hora")
                 .setKey("hora");
 
         gridDetalle.addColumn(TratamientoMedico::getDia)
@@ -85,7 +95,7 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
                 .setKey("dia");
         gridDetalle.addComponentColumn(obj -> {
 
-            Button editar = new Button("Eliminar", event -> {
+            Button editar = new Button(new Icon(VaadinIcon.TRASH), event -> {
 
                 ConfirmDialo dialog = new ConfirmDialo(
                         "¿Estás seguro de que deseas eliminar esta pastilla?",
@@ -109,10 +119,10 @@ public class TratamientoMedicoView extends VerticalLayout implements HasUrlParam
             return new HorizontalLayout(editar);
         }).setHeader("Acciones");
 
-//        gridDetalle.getColumns().forEach(col -> {
-//            col.setAutoWidth(true);
-//            col.setSortable(true);
-//        });
+        gridDetalle.getColumns().forEach(col -> {
+            col.setAutoWidth(true);
+            col.setSortable(true);
+        });
     }
 
     /**

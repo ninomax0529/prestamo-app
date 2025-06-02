@@ -5,7 +5,6 @@ import com.maxsoft.application.modelo.TratamientoMedico;
 import com.maxsoft.application.repo.MedicamentoRepo;
 import com.maxsoft.application.service.TratamientoMedicoService;
 import com.maxsoft.application.util.ClaseUtil;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -15,11 +14,8 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
@@ -37,7 +33,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import java.io.ByteArrayInputStream;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.List;
 
 public class MedicamentoViewCard extends ListItem {
 
@@ -129,14 +124,14 @@ public class MedicamentoViewCard extends ListItem {
             dialog.open();
         });
 
-        Integer canBebida =tratamientoService.getCantidadBebida(medic.getCodigo());
+        Integer canBebida = tratamientoService.getCantidadBebida(medic.getCodigo());
         Integer existencia = medic.getCantidadComprada() - canBebida;
         medic.setExistencia(existencia);
         medic.setCantidadBebida(canBebida);
-         mediRepoArg.save(medic);
+        mediRepoArg.save(medic);
 
-        if (medic.getExistencia()<=0) {
-            
+        if (medic.getExistencia() <= 0) {
+
             btnRegistrar.setEnabled(false);
 //            
 //            List<TratamientoMedico> lista=tratamientoService.getListaActiva(medic.getCodigo());
@@ -146,10 +141,9 @@ public class MedicamentoViewCard extends ListItem {
 //                tra.setHistorial(true);
 //                tratamientoService.guardar(tra);
 //            }
-            
-            
+
         }
-        
+
         hlBotones.add(btnRegistrar, btnVerRegistro);
 
         StreamResource resource = new StreamResource(
@@ -176,23 +170,27 @@ public class MedicamentoViewCard extends ListItem {
         H4 h3CantidadBebida = new H4("Me he bebido "
                 + medic.getCantidadBebida() + " de " + medic.getCantidadComprada());
         H4 h3Existencia = new H4("Me quedan " + medic.getExistencia());
+          h3Existencia.getStyle()
+                .set("color", "#FF0000")
+                .set("margin", "10px 0");
 
         H4 header = new H4();
+        String fechaStr = ClaseUtil.formatoFechaLocal(medic.getFechaCreacion());
 //        header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
-        header.setText("Fecha :");
+        header.setText("Fecha bebida : " + fechaStr);
 
         Span subtitle = new Span();
         subtitle.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
 
-        H4 h3Fecha = new H4(medic.getHora());
-        String fechaStr = ClaseUtil.formatoFechaLocal(medic.getFechaCreacion());
+        H4 h3Fecha = new H4();
+//        String fechaStr = ClaseUtil.formatoFechaLocal(medic.getFechaCreacion());
         h3Fecha.setText(fechaStr);
 
-        H3 h3 = new H3("Hora : ");
-        H3 hora = new H3(medic.getHora());
+        H4 hora = new H4(medic.getHora());
+        H4 h3 = new H4("Hora bebida : " + medic.getHora());
 //        h3.addClassName(Margin.Vertical.MEDIUM);
-        HorizontalLayout hlFecha = new HorizontalLayout(header, h3Fecha);
-        HorizontalLayout hlHora = new HorizontalLayout(h3, hora);
+        HorizontalLayout hlFecha = new HorizontalLayout(header);
+        HorizontalLayout hlHora = new HorizontalLayout(h3);
         HorizontalLayout hlBebida = new HorizontalLayout(h3CantidadBebida);
 
         hlFecha.setSpacing(false);

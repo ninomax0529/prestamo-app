@@ -1,6 +1,7 @@
 package com.maxsoft.application;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import java.util.TimeZone;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
+@PWA(name = "App de Medicina", shortName = "AppMedical", offlineResources = {})
 @Theme(value = "medicina-app")
 public class Application implements AppShellConfigurator {
 
