@@ -30,5 +30,7 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Arranca la aplicación
-CMD ["java", "-jar", "app.jar"]
+#CMD ["java", "-jar", "app.jar"]
+# Comando para ejecutar tu aplicación con opciones de memoria
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 
