@@ -20,8 +20,10 @@ import java.util.List;
 /**
  * The main view is a top-level placeholder for other views.
  */
+
 @Layout
 @AnonymousAllowed
+
 public class MainLayout extends AppLayout {
 
     private H1 viewTitle;
@@ -43,7 +45,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        Span appName = new Span("AppMed");
+        Span appName = new Span("AppPrestamo");
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
         Header header = new Header(appName);
 

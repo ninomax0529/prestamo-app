@@ -15,8 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-@PWA(name = "App de Medicina", shortName = "AppMedical", offlineResources = {})
-@Theme(value = "medicina-app")
+@PWA(name = "App de Prestamo", shortName = "AppPrestamo", offlineResources = {})
+@Theme(value = "prestamo-app")
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
