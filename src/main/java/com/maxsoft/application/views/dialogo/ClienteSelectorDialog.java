@@ -33,6 +33,7 @@ public class ClienteSelectorDialog extends Dialog {
     public ClienteSelectorDialog(List<Cliente> clientes, Consumer<Cliente> onClienteSeleccionado) {
         this.clientes = clientes;
 
+        setSizeFull();
         setHeaderTitle("Seleccionar Cliente");
         setModal(true);
         setCloseOnEsc(true);
@@ -75,6 +76,7 @@ public class ClienteSelectorDialog extends Dialog {
     }
 
     private void configurarFiltros() {
+        
         filtroNombre.setPlaceholder("Ej: Juan");
         filtroNombre.setClearButtonVisible(true);
         filtroNombre.setValueChangeMode(ValueChangeMode.EAGER); // 👈 Aquí está la clave

@@ -20,9 +20,8 @@ public interface ReciboDeIngresoRepo extends JpaRepository<ReciboDeIngreso, Inte
                        select  count(*)  from  recibo_de_ingreso 
                       where 
                       anulado=false
-                      and cliente=:codClint """;
-
+                      and cliente=:codClint """; 
     @Query(value = strCant, nativeQuery = true)
     public Integer getCantidadPago(@Param("codClint") int op);
-
+    
 }

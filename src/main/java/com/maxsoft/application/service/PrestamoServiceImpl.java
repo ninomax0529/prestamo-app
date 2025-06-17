@@ -15,20 +15,34 @@ public class PrestamoServiceImpl implements PrestamoService {
 
     @Autowired
     PrestamoRepo repo;
-    
+
     @Override
     public Prestamo guardar(Prestamo obj) {
-      
-        Prestamo p=repo.save(obj);
+
+        Prestamo p = repo.save(obj);
         return p;
     }
 
     @Override
     public List<Prestamo> getLista() {
-       
-        List<Prestamo>  lista=repo.findAll();
+
+        List<Prestamo> lista = repo.findAll();
         return lista;
-        
+
     }
-    
+
+    @Override
+    public List<Prestamo> getPrestamoPendiente() {
+
+        List<Prestamo> lista = repo.getPrestamoPendiente();
+        return lista;
+    }
+
+    @Override
+    public Double getMontoPendiente(int codPrestamo) {
+      
+        Double monto=repo.getMontoPendiente(codPrestamo);
+        return monto;
+    }
+
 }

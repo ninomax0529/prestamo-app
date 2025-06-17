@@ -13,7 +13,6 @@ import com.maxsoft.application.service.ReciboDeIngresoService;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
@@ -27,7 +26,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.annotation.security.PermitAll;
@@ -38,13 +36,9 @@ import java.util.List;
 
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
 import javax.sql.DataSource;
-import net.sf.jasperreports.engine.JasperRunManager;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @Route(value = "recibos")
@@ -61,7 +55,8 @@ public class ReciboDeIngresoView extends VerticalLayout {
     private final Grid<ReciboDeIngreso> grid = new Grid<>(ReciboDeIngreso.class, false);
     private final Binder<ReciboDeIngreso> binder = new Binder<>(ReciboDeIngreso.class);
 
-    private final DatePicker fecha = new DatePicker("Fecha");
+    private final DatePicker dpFecha = new DatePicker("Fecha");
+
     private final TextField nombreCliente = new TextField("Nombre del Cliente");
     private final TextField numeroPrestamo = new TextField("Numero Prestamo");
     private final NumberField txtValorCuota = new NumberField("Valor Cuota");
@@ -69,9 +64,9 @@ public class ReciboDeIngresoView extends VerticalLayout {
     private final TextField creadoPor = new TextField("Creado Por");
     private final TextArea descripcionPago = new TextArea("Descripción del Pago");
 
-    private final Button guardar = new Button("Guardar");
+    private final Button btnGuardar = new Button("Guardar");
     private final Button limpiar = new Button("Limpiar");
-    Button buscarPrestamo = new Button(new Icon(VaadinIcon.SEARCH));   
+    Button buscarPrestamo = new Button(new Icon(VaadinIcon.SEARCH));
     private ReciboDeIngreso reciboActual;
     Cliente cliente;
     Prestamo prestamo;
@@ -80,7 +75,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
     public ReciboDeIngresoView(ReciboDeIngresoService reciboService, PrestamoService prestamoService) {
         this.reciboService = reciboService;
         this.prestamoService = prestamoService;
-   
+
         setSpacing(false);
 //        setSizeFull();
         configureGrid();
@@ -89,16 +84,17 @@ public class ReciboDeIngresoView extends VerticalLayout {
         add(new H3("Gestión de Cobros"), crearFormulario(), grid);
         actualizarGrid();
 
-
         buscarPrestamo.addClickListener(e -> {
 
-            List<Prestamo> prestamos = prestamoService.getLista(); // desde la capa de servicio
+            List<Prestamo> prestamos = prestamoService.getPrestamoPendiente(); // desde la capa de servicio
             PrestamoDialog dialog = new PrestamoDialog(prestamos, seleccionado -> {
+
                 nombreCliente.setValue(seleccionado.getNombreCliente()); // ComboBox o campo vinculado
                 numeroPrestamo.setValue(seleccionado.getCodigo().toString()); // ComboBox o campo vinculado
                 txtValorCuota.setValue(seleccionado.getMontoCuota());
                 cliente = seleccionado.getCliente();
                 prestamo = seleccionado;
+                btnGuardar.setEnabled(true);
 
                 StringBuilder descripcion = new StringBuilder();
                 int canPago = this.reciboService.getCantidadPago(cliente.getCodigo()) + 1;
@@ -123,22 +119,27 @@ public class ReciboDeIngresoView extends VerticalLayout {
 //        grid.addColumn(r -> r.getMontoPendiente()).setHeader("Pendiente");
         grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago");
 
-        grid.addComponentColumn(articulo -> {
-            
+        grid.addComponentColumn(recibo -> {
+
             Button btnVere = new Button(VaadinIcon.EYE.create(), event -> {
 
                 try (Connection conn = dataSource.getConnection()) {
+
                     RptReciboIngreso rec = new RptReciboIngreso();
 
-                    StreamResource pdfResource = rec.reciboIngreso(1, conn);
+                    if (recibo != null) {
 
-                    Anchor anchor = new Anchor(pdfResource, "");
-                    anchor.getElement().setAttribute("download", false);
-                    anchor.getElement().setAttribute("target", "_blank");
+                        StreamResource pdfResource = rec.reciboIngreso(recibo.getCodigo(), conn);
 
-                    anchor.getElement().callJsFunction("click"); // dispara la apertura automática
+                        Anchor anchor = new Anchor(pdfResource, "");
+                        anchor.getElement().setAttribute("download", false);
+                        anchor.getElement().setAttribute("target", "_blank");
 
-                    add(anchor);
+                        anchor.getElement().callJsFunction("click"); // dispara la apertura automática
+
+                        add(anchor);
+                    }
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     Notification.show("Error al generar el reporte");
@@ -151,6 +152,9 @@ public class ReciboDeIngresoView extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(event -> {
             reciboActual = event.getValue();
             if (reciboActual != null) {
+
+                buscarPrestamo.setEnabled(false);
+                btnGuardar.setEnabled(false);
                 cliente = reciboActual.getCliente();
                 prestamo = reciboActual.getPrestamo();
                 txtValorCuota.setValue(reciboActual.getTotal());
@@ -162,20 +166,22 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
     private VerticalLayout crearFormulario() {
 
+        btnGuardar.setEnabled(false);
+        dpFecha.setValue(LocalDate.now());
         numeroPrestamo.setEnabled(false);
         nombreCliente.setEnabled(false);
-        HorizontalLayout botones = new HorizontalLayout(guardar, limpiar);
+        HorizontalLayout botones = new HorizontalLayout(btnGuardar, limpiar);
         HorizontalLayout hlcliente = new HorizontalLayout(numeroPrestamo, buscarPrestamo);
         hlcliente.setAlignItems(Alignment.BASELINE);
         hlcliente.setSpacing(false);
 
-        guardar.addClickListener(e -> guardar());
+        btnGuardar.addClickListener(e -> guardar());
         limpiar.addClickListener(e -> limpiarFormulario());
 
         binder.bindInstanceFields(this);
 
         VerticalLayout formulario = new VerticalLayout(
-                fecha,
+                dpFecha,
                 hlcliente,
                 nombreCliente,
                 txtValorCuota,
@@ -186,7 +192,9 @@ public class ReciboDeIngresoView extends VerticalLayout {
     }
 
     private void guardar() {
+
         try {
+            
             if (reciboActual == null) {
                 reciboActual = new ReciboDeIngreso();
             }
@@ -194,12 +202,14 @@ public class ReciboDeIngresoView extends VerticalLayout {
             binder.writeBean(reciboActual);
             reciboActual.setFechaCreacion(new Date());
             reciboActual.setCliente(cliente);
-            reciboActual.setPrestamo(prestamo);
-            reciboActual.setMontoPendiente(0.00);
+            reciboActual.setPrestamo(prestamo);         
             reciboActual.setTotal(txtValorCuota.getValue());
 
-            System.out.println("reciboActual" + reciboActual);
+            Double montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
+            reciboActual.setMontoPendiente(montoPend);
+
             reciboService.guardar(reciboActual);
+            
             actualizarGrid();
             limpiarFormulario();
         } catch (ValidationException e) {
@@ -208,6 +218,9 @@ public class ReciboDeIngresoView extends VerticalLayout {
     }
 
     private void limpiarFormulario() {
+
+        btnGuardar.setEnabled(false);
+        buscarPrestamo.setEnabled(true);
         reciboActual = null;
         txtValorCuota.clear();
         numeroPrestamo.clear();

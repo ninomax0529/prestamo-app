@@ -8,9 +8,13 @@ import com.maxsoft.application.modelo.Prestamo;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -19,46 +23,85 @@ import java.util.List;
 public class PrestamoDialog extends Dialog {
 
     private final Grid<Prestamo> grid = new Grid<>(Prestamo.class, false);
-    private final TextField filtro = new TextField("Buscar cliente");
-    private final Button seleccionar = new Button("Seleccionar");
+    private final TextField filtroNombre = new TextField("Buscar por nombre");
+    private final TextField filtroCodigo = new TextField("Buscar por Codigo");
+    private final Button seleccionarButton = new Button("Seleccionar");
     private Prestamo prestamoSeleccionado;
 
-    public interface PrestamoSeleccionadoListener {
-        void alSeleccionar(Prestamo prestamo);
-    }
+    private final List<Prestamo> listaPrestamo;
 
-    public PrestamoDialog(List<Prestamo> prestamos, PrestamoSeleccionadoListener listener) {
+    public PrestamoDialog(List<Prestamo> prestamos,Consumer<Prestamo> listener) {
+       
         setHeaderTitle("Seleccionar Préstamo");
 
-        filtro.setPlaceholder("Filtrar por cliente...");
-        filtro.setWidthFull();
-        filtro.addValueChangeListener(e -> {
-            String filtroTexto = e.getValue().trim().toLowerCase();
-            grid.setItems(prestamos.stream()
-                .filter(p -> p.getNombreCliente() != null &&
-                             p.getNombreCliente().toLowerCase().contains(filtroTexto))
-                .toList());
-        });
+        this.listaPrestamo = prestamos;
 
-        grid.addColumn(Prestamo::getCodigo).setHeader("Código");
-        grid.addColumn(Prestamo::getNombreCliente).setHeader("Cliente");
-        grid.addColumn(Prestamo::getMontoPrestado).setHeader("Monto");
-        grid.setItems(prestamos);
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        setSizeFull();
+        setHeaderTitle("Seleccionar Prestamo");
+        setModal(true);
+        setCloseOnEsc(true);
+        setCloseOnOutsideClick(true);
+       filtroNombre.focus();
 
-        seleccionar.addClickListener(e -> {
-            prestamoSeleccionado = grid.asSingleSelect().getValue();
+        configurarGrid();
+        configurarFiltros();
+
+        seleccionarButton.setEnabled(false);
+        seleccionarButton.addClickListener(e -> {
             if (prestamoSeleccionado != null) {
-                listener.alSeleccionar(prestamoSeleccionado);
+                listener.accept(prestamoSeleccionado);
                 close();
             }
         });
 
-        VerticalLayout layout = new VerticalLayout(filtro, grid, seleccionar);
-        layout.setSizeFull();
-        layout.setPadding(false);
-        layout.setSpacing(false);
-        add(layout);
+        Button cancelar = new Button("Cancelar", e -> close());
+
+        HorizontalLayout filtros = new HorizontalLayout(filtroNombre, filtroCodigo);
+        filtros.setWidthFull();
+
+        HorizontalLayout botones = new HorizontalLayout(seleccionarButton, cancelar);
+
+        add(new VerticalLayout(filtros, grid, botones));
+    }
+
+    private void configurarGrid() {
+        
+        grid.addColumn(Prestamo::getCodigo).setHeader("Código").setAutoWidth(true);
+        grid.addColumn(Prestamo::getNombreCliente).setHeader("Nombre").setAutoWidth(true);
+    
+        grid.setItems(listaPrestamo);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+
+        grid.addSelectionListener(event -> {
+            prestamoSeleccionado = event.getFirstSelectedItem().orElse(null);
+            seleccionarButton.setEnabled(prestamoSeleccionado != null);
+        });
+    }
+
+    private void configurarFiltros() {
+        
+        filtroNombre.setPlaceholder("Ej: Juan");
+        filtroNombre.setClearButtonVisible(true);
+        filtroNombre.setValueChangeMode(ValueChangeMode.EAGER); // 👈 Aquí está la clave
+        filtroNombre.addValueChangeListener(e -> aplicarFiltros());
+
+        filtroCodigo.setPlaceholder("Ej: 1");
+        filtroCodigo.setClearButtonVisible(true);
+        filtroCodigo.setValueChangeMode(ValueChangeMode.EAGER); // 👈 Aquí también
+        filtroCodigo.addValueChangeListener(e -> aplicarFiltros());
+    }
+
+    private void aplicarFiltros() {
+        String nombreFiltro = filtroNombre.getValue().trim().toLowerCase();
+        String codigoFiltro = filtroCodigo.getValue().trim().toLowerCase();
+
+        List<Prestamo> filtrados = listaPrestamo.stream()
+                .filter(cliente
+                        -> (nombreFiltro.isEmpty() || cliente.getNombreCliente().toLowerCase().contains(nombreFiltro))
+                && (codigoFiltro.isEmpty() || cliente.getCodigo().toString().toLowerCase().contains(codigoFiltro))
+                )
+                .collect(Collectors.toList());
+
+        grid.setItems(filtrados);
     }
 }
-

@@ -14,5 +14,10 @@ import java.util.List;
 public interface PrestamoService {
 
     Prestamo guardar(Prestamo obj);
+
     List<Prestamo> getLista();
+
+    List<Prestamo> getPrestamoPendiente();
+
+    Double getMontoPendiente(int codPrestamo);
 }
