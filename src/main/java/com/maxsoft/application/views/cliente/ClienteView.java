@@ -23,6 +23,7 @@ import com.vaadin.flow.component.notification.Notification;
 
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.service.ClienteService;
+import com.maxsoft.application.service.PrestamoService;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
@@ -38,6 +39,8 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 public class ClienteView extends VerticalLayout {
 
     private final ClienteService clienteService;
+    private final PrestamoService prestamoService;
+
     private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     private final Binder<Cliente> binder = new Binder<>(Cliente.class);
@@ -57,8 +60,9 @@ public class ClienteView extends VerticalLayout {
     private Cliente clienteActual = new Cliente();
 
     @Autowired
-    public ClienteView(ClienteService clienteService) {
+    public ClienteView(ClienteService clienteService, PrestamoService prestamoService) {
         this.clienteService = clienteService;
+        this.prestamoService = prestamoService;
 
         add(new H3("Gestión de Clientes"));
 
@@ -89,7 +93,7 @@ public class ClienteView extends VerticalLayout {
     }
 
     private void configurarFormulario() {
-        
+
         FormLayout form = new FormLayout();
         habilitado.setValue(Boolean.TRUE);
         form.add(nombre, cedula, celular, direccion, lugarDeTrabajo, referencia, habilitado);
@@ -116,6 +120,19 @@ public class ClienteView extends VerticalLayout {
         if (cliente != null) {
             this.clienteActual = cliente;
             binder.readBean(cliente);
+            Double totalPendiente = prestamoService
+                    .getPrestamoPendiente(cliente.getCodigo());
+
+            if (totalPendiente != null) {
+                if (totalPendiente > 0) {
+                    habilitado.setEnabled(false);
+                } else {
+                    habilitado.setEnabled(true);
+                }
+
+            }else{
+                   habilitado.setEnabled(true);
+            }
         }
     }
 
@@ -140,5 +157,4 @@ public class ClienteView extends VerticalLayout {
         grid.setItems(clienteService.getLista());
     }
 
-  
 }

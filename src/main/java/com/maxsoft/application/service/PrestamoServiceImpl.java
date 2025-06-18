@@ -40,8 +40,22 @@ public class PrestamoServiceImpl implements PrestamoService {
 
     @Override
     public Double getMontoPendiente(int codPrestamo) {
-      
-        Double monto=repo.getMontoPendiente(codPrestamo);
+
+        Double monto = repo.getMontoPendiente(codPrestamo);
+        return monto;
+    }
+
+    @Override
+    public Double getMontoPagado(int codPrestamo) {
+
+        Double monto = repo.getMontoPagado(codPrestamo);
+        return monto;
+    }
+
+    @Override
+    public Double getPrestamoPendiente(int codCliente) {
+
+        Double monto = repo.getPrestamoPendiente(codCliente);
         return monto;
     }
 

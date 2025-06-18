@@ -36,3 +36,17 @@
   width: 16px;
   height: 16px;
 }
+
+.boton-calcular {
+  background-color: #17a2b8; /* azul tipo info */
+  color: white;
+  border-radius: 6px;
+  padding: 5px 12px;
+   font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}

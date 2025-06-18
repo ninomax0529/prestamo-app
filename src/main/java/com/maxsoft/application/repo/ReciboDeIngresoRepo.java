@@ -5,6 +5,7 @@
 package com.maxsoft.application.repo;
 
 import com.maxsoft.application.modelo.ReciboDeIngreso;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,12 +17,24 @@ import org.springframework.data.repository.query.Param;
 public interface ReciboDeIngresoRepo extends JpaRepository<ReciboDeIngreso, Integer>{
     
     
+    String strLista = """
+                       select * from  recibo_de_ingreso 
+                        where 
+                        anulado=:estado
+                      
+                       """; 
+    
+    @Query(value = strLista, nativeQuery = true)
+    public List<ReciboDeIngreso> getLista(@Param("estado") boolean estado);
+    
     String strCant = """
                        select  count(*)  from  recibo_de_ingreso 
                       where 
                       anulado=false
-                      and cliente=:codClint """; 
+                      and prestamo=:codPrestamo """; 
+    
     @Query(value = strCant, nativeQuery = true)
-    public Integer getCantidadPago(@Param("codClint") int op);
+    public Integer getCantidadPago(@Param("codPrestamo") int codPrestamo);
+    
     
 }

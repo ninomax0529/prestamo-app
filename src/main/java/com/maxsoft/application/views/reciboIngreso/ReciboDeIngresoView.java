@@ -10,9 +10,12 @@ import com.maxsoft.application.modelo.ReciboDeIngreso;
 import com.maxsoft.application.reporte.RptReciboIngreso;
 import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.ReciboDeIngresoService;
+import com.maxsoft.application.util.ClaseUtil;
+import com.maxsoft.application.views.dialogo.ConfirmDialog;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
@@ -61,7 +64,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
     private final TextField numeroPrestamo = new TextField("Numero Prestamo");
     private final NumberField txtValorCuota = new NumberField("Valor Cuota");
     private final NumberField montoPendiente = new NumberField("Monto Pendiente");
-    private final TextField creadoPor = new TextField("Creado Por");
+    private final NumberField montoPrestado = new NumberField("Monto Prestado");
     private final TextArea descripcionPago = new TextArea("Descripción del Pago");
 
     private final Button btnGuardar = new Button("Guardar");
@@ -97,7 +100,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
                 btnGuardar.setEnabled(true);
 
                 StringBuilder descripcion = new StringBuilder();
-                int canPago = this.reciboService.getCantidadPago(cliente.getCodigo()) + 1;
+                int canPago = this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
 
                 descripcion.append("Pago ").append(canPago)
                         .append(" de ").append(prestamo.getCantidadPeriodo());
@@ -111,17 +114,17 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
     private void configureGrid() {
 
-        grid.addColumn(r -> r.getCodigo()).setHeader("Num.Recibo");
-        grid.addColumn(r -> r.getPrestamo() != null ? r.getPrestamo().getCodigo() : "").setHeader("Num.Préstamo");
-        grid.addColumn(r -> r.getFecha()).setHeader("Fecha");
-        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente");
-        grid.addColumn(r -> r.getTotal()).setHeader("Total");
+        grid.addColumn(r -> r.getCodigo()).setHeader("Recibo").setAutoWidth(true);
+        grid.addColumn(r -> r.getPrestamo() != null ? r.getPrestamo().getCodigo() : "").setHeader("Préstamo");
+        grid.addColumn(r -> r.getFecha()).setHeader("Fecha").setAutoWidth(true);
+        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente").setAutoWidth(true);
+        grid.addColumn(r -> r.getTotal()).setHeader("Total").setAutoWidth(true);
 //        grid.addColumn(r -> r.getMontoPendiente()).setHeader("Pendiente");
-        grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago");
+        grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago").setAutoWidth(true);
 
         grid.addComponentColumn(recibo -> {
 
-            Button btnVere = new Button(VaadinIcon.EYE.create(), event -> {
+            Button btnVer = new Button(VaadinIcon.EYE.create(), event -> {
 
                 try (Connection conn = dataSource.getConnection()) {
 
@@ -146,8 +149,57 @@ public class ReciboDeIngresoView extends VerticalLayout {
                 }
             });
 
-            return btnVere;
+            return btnVer;
         }).setHeader("Ver");
+
+        grid.addComponentColumn(recibo -> {
+
+            Button btnAnular = new Button(VaadinIcon.CLOSE.create(), event -> {
+
+                try {
+
+                    if (recibo != null) {
+
+                        ConfirmDialog dialog = new ConfirmDialog(
+                                "¿Estás seguro que quiere anular el recibo -> " + recibo.getCodigo(),
+                                () -> {
+
+                                    Double montoPend, montoPagado;
+                                    recibo.setAnulado(true);
+                                    recibo.setFechaAnulado(new Date());
+                                    recibo.setAnuladoPor("ADMIN");
+
+                                    prestamo = recibo.getPrestamo();
+                                    reciboService.guardar(recibo);
+
+                                    montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
+                                    montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
+
+                                    prestamo.setTotalPagado(montoPagado);
+                                    prestamo.setTotalPendiente(montoPend);
+
+                                    prestamoService.guardar(prestamo);
+
+                                    actualizarGrid();
+                                    Notification.show("Recibo anulado exitosamente", 3000, Notification.Position.MIDDLE);
+
+                                },
+                                () -> {
+
+                                }
+                        );
+                        dialog.open();
+
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Notification.show("Error al generar el reporte");
+                }
+            });
+
+            return btnAnular;
+        }).setHeader("Anular");
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             reciboActual = event.getValue();
@@ -164,52 +216,74 @@ public class ReciboDeIngresoView extends VerticalLayout {
         });
     }
 
-    private VerticalLayout crearFormulario() {
+    private FormLayout crearFormulario() {
 
+        FormLayout form = new FormLayout();
         btnGuardar.setEnabled(false);
         dpFecha.setValue(LocalDate.now());
         numeroPrestamo.setEnabled(false);
         nombreCliente.setEnabled(false);
+        txtValorCuota.setWidth("30%");
+        montoPendiente.setWidth("30%");
+        montoPrestado.setWidth("30%");
+
         HorizontalLayout botones = new HorizontalLayout(btnGuardar, limpiar);
         HorizontalLayout hlcliente = new HorizontalLayout(numeroPrestamo, buscarPrestamo);
+//        HorizontalLayout hlPrestamo = new HorizontalLayout(montoPrestado,txtValorCuota, montoPendiente);
+
         hlcliente.setAlignItems(Alignment.BASELINE);
         hlcliente.setSpacing(false);
+//
+//        hlPrestamo.setAlignItems(Alignment.BASELINE);
+//        hlPrestamo.setSpacing(true);
+//        hlPrestamo.setSizeFull();
 
         btnGuardar.addClickListener(e -> guardar());
+
         limpiar.addClickListener(e -> limpiarFormulario());
 
         binder.bindInstanceFields(this);
 
-        VerticalLayout formulario = new VerticalLayout(
-                dpFecha,
+        form.add(dpFecha,
                 hlcliente,
                 nombreCliente,
                 txtValorCuota,
                 descripcionPago,
                 botones
         );
-        return formulario;
+        return form;
     }
 
     private void guardar() {
 
         try {
-            
+
             if (reciboActual == null) {
                 reciboActual = new ReciboDeIngreso();
             }
 
+            Double montoPend, montoPagado;
+
             binder.writeBean(reciboActual);
             reciboActual.setFechaCreacion(new Date());
+            reciboActual.setFecha(ClaseUtil.asDate(dpFecha.getValue()));
             reciboActual.setCliente(cliente);
-            reciboActual.setPrestamo(prestamo);         
+            reciboActual.setPrestamo(prestamo);
             reciboActual.setTotal(txtValorCuota.getValue());
 
-            Double montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
+            montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
+            montoPend = montoPend - reciboActual.getTotal();
+
             reciboActual.setMontoPendiente(montoPend);
 
             reciboService.guardar(reciboActual);
-            
+
+            montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
+            prestamo.setTotalPagado(montoPagado);
+            prestamo.setTotalPendiente(montoPend);
+
+            prestamoService.guardar(prestamo);
+
             actualizarGrid();
             limpiarFormulario();
         } catch (ValidationException e) {
@@ -229,7 +303,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
     }
 
     private void actualizarGrid() {
-        List<ReciboDeIngreso> lista = reciboService.getLista();
+        List<ReciboDeIngreso> lista = reciboService.getLista(false);
         grid.setItems(lista);
     }
 

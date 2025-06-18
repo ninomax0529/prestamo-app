@@ -15,21 +15,30 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Autowired
     ClienteRepo repo;
+
     @Override
     public Cliente guardar(Cliente obj) {
-       
-        Cliente c=repo.save(obj);
-        
+
+        Cliente c = repo.save(obj);
+
         return c;
-        
+
     }
 
     @Override
     public List<Cliente> getLista() {
-       
-        List<Cliente>lista=repo.findAll();
-        
+
+        List<Cliente> lista = repo.findAll();
+
         return lista;
     }
-    
+
+    @Override
+    public List<Cliente> getLista(boolean estado) {
+
+        List<Cliente> lista = repo.getLista(estado);
+
+        return lista;
+    }
+
 }

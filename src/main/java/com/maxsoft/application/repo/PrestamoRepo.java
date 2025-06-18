@@ -23,16 +23,35 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
 
     @Query(value = strPrestamo, nativeQuery = true)
     public List<Prestamo> getPrestamoPendiente();
-    
-           String strAbonado = """
+
+    String strMontPendiente = """
                                
-                       select   (monto_prestado-F_TOTAL_ABONO(p.codigo))
+                       select   (total-F_TOTAL_ABONO(p.codigo))
                        from  prestamo  p
                        where anulado=false
                        and codigo=:codPrestamo  """;
-       
-    @Query(value = strAbonado, nativeQuery = true)
+
+    @Query(value = strMontPendiente, nativeQuery = true)
     public Double getMontoPendiente(@Param("codPrestamo") int codPrestamo);
-    
-        
+
+    String strPrestamoPendiente = """
+                               
+                       select   ifnull((total-F_TOTAL_ABONO(p.codigo)),0)
+                       from  prestamo  p
+                       where anulado=false
+                       and cliente=:codCliente  """;
+
+    @Query(value = strPrestamoPendiente, nativeQuery = true)
+    public Double getPrestamoPendiente(@Param("codCliente") int codCliente);
+
+    String strAbonado = """
+                               
+                       select F_TOTAL_ABONO(p.codigo)
+                       from  prestamo  p
+                       where anulado=false
+                       and codigo=:codPrestamo  """;
+
+    @Query(value = strAbonado, nativeQuery = true)
+    public Double getMontoPagado(@Param("codPrestamo") int codPrestamo);
+
 }

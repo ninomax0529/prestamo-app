@@ -20,4 +20,8 @@ public interface PrestamoService {
     List<Prestamo> getPrestamoPendiente();
 
     Double getMontoPendiente(int codPrestamo);
+
+    Double getMontoPagado(int codPrestamo);
+
+    Double getPrestamoPendiente(int codCliente);
 }

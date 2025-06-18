@@ -34,8 +34,17 @@ public class ReciboDeIngresoServiceImpl implements ReciboDeIngresoService {
 
     @Override
     public Integer getCantidadPago(int cliente) {
-      
-       return repo.getCantidadPago(cliente);
+
+        return repo.getCantidadPago(cliente);
+    }
+
+    @Override
+    public List<ReciboDeIngreso> getLista(boolean estado) {
+
+        List<ReciboDeIngreso> lista = repo.getLista(estado);
+
+        return lista;
+
     }
 
 }

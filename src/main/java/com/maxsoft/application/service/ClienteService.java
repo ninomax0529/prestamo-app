@@ -12,7 +12,10 @@ import java.util.List;
  * @author Maximiliano
  */
 public interface ClienteService {
-    
+
     Cliente guardar(Cliente obj);
+
     List<Cliente> getLista();
+
+    List<Cliente> getLista(boolean estado);
 }

@@ -30,8 +30,8 @@ public class PrestamoDialog extends Dialog {
 
     private final List<Prestamo> listaPrestamo;
 
-    public PrestamoDialog(List<Prestamo> prestamos,Consumer<Prestamo> listener) {
-       
+    public PrestamoDialog(List<Prestamo> prestamos, Consumer<Prestamo> listener) {
+
         setHeaderTitle("Seleccionar Préstamo");
 
         this.listaPrestamo = prestamos;
@@ -41,7 +41,7 @@ public class PrestamoDialog extends Dialog {
         setModal(true);
         setCloseOnEsc(true);
         setCloseOnOutsideClick(true);
-       filtroNombre.focus();
+        filtroNombre.focus();
 
         configurarGrid();
         configurarFiltros();
@@ -65,10 +65,10 @@ public class PrestamoDialog extends Dialog {
     }
 
     private void configurarGrid() {
-        
+
         grid.addColumn(Prestamo::getCodigo).setHeader("Código").setAutoWidth(true);
         grid.addColumn(Prestamo::getNombreCliente).setHeader("Nombre").setAutoWidth(true);
-    
+
         grid.setItems(listaPrestamo);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
@@ -79,7 +79,7 @@ public class PrestamoDialog extends Dialog {
     }
 
     private void configurarFiltros() {
-        
+
         filtroNombre.setPlaceholder("Ej: Juan");
         filtroNombre.setClearButtonVisible(true);
         filtroNombre.setValueChangeMode(ValueChangeMode.EAGER); // 👈 Aquí está la clave

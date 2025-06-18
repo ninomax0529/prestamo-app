@@ -14,6 +14,8 @@ import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.TipoPrestamoService;
 import com.maxsoft.application.util.ClaseUtil;
 import com.maxsoft.application.views.dialogo.ClienteSelectorDialog;
+import com.maxsoft.application.views.dialogo.ConfirmDialog;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -57,11 +59,10 @@ public class PrestamoView extends VerticalLayout {
 
     // Componentes del formulario
     private final DatePicker fechaInicio = new DatePicker("Fecha");
-    private final DatePicker fechaFinal = new DatePicker("Fecha Final");
     private final DatePicker fechaPrimerPago = new DatePicker("Fecha Primer Pago");
     private final TextField nombreCliente = new TextField("Cliente");
     private final NumberField montoPrestado = new NumberField("Monto Prestado");
-    private final NumberField totalPrestamo = new NumberField("Total Prestamo");
+    private final NumberField totalPrestamo = new NumberField("Total");
     private final NumberField montoIntere = new NumberField("Monto Interés");
     private final NumberField tasaDeIntere = new NumberField("Tasa de Interés %");
     private final NumberField montoCuota = new NumberField("Monto Cuota");
@@ -70,19 +71,21 @@ public class PrestamoView extends VerticalLayout {
     private final ComboBox<Periodo> periodo = new ComboBox<>("Periodo");
     private final ComboBox<TipoPrestamo> tipoPrestamo = new ComboBox<>("Tipo de Préstamo");
 
-    private final Button guardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
-    private final Button limpiar = new Button("Limpiar");
+    private final Button btnGuardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
+    private final Button btnLimpiar = new Button("Limpiar", VaadinIcon.REFRESH.create());
     Button buscarClienteBtn = new Button(new Icon(VaadinIcon.SEARCH));
     private final Button btnCalcular = new Button("Calcular");
 
     public PrestamoView(PrestamoService prestamoService, PeriodoService periodoService, TipoPrestamoService tipoPrestamoService,
             ClienteService clienteService) {
-        
+
+        setPadding(true);
+        setSpacing(true);
         this.prestamoService = prestamoService;
         this.periodoService = periodoService;
         this.tipoPrestamoService = tipoPrestamoService;
         this.clienteService = clienteService;
-        guardar.setEnabled(false);
+        btnGuardar.setEnabled(false);
         periodo.addValueChangeListener(e -> {
 
             if (e.getValue() != null) {
@@ -92,7 +95,8 @@ public class PrestamoView extends VerticalLayout {
         });
 
         addClassName("prestamo-view");
-          buscarClienteBtn.addClassName("boton-buscar");
+        buscarClienteBtn.addClassName("boton-buscar");
+        btnCalcular.addClassName("boton-calcular");
 //        setSizeFull();
 
         configurarFormulario();
@@ -102,12 +106,7 @@ public class PrestamoView extends VerticalLayout {
         add(new H3("Gestión de Préstamos"), crearFormulario(), grid);
         actualizarGrid();
 
-        binder.forField(cantidadPeriodoField)
-                .withNullRepresentation("") // trata el string vacío como null
-                .withConverter(
-                        new StringToIntegerConverter("Debe ser un número entero")) // conversión segura
-                .bind(Prestamo::getCantidadPeriodo, Prestamo::setCantidadPeriodo);
-
+        confiBinder();
     }
 
     private void configurarFormulario() {
@@ -117,29 +116,39 @@ public class PrestamoView extends VerticalLayout {
 
         tipoPrestamo.setItems(tipoPrestamoService.getLista());
         tipoPrestamo.setItemLabelGenerator(TipoPrestamo::getNombre);
-
+//        binder.forField(totalPrestamo).bind("total");
         binder.bindInstanceFields(this);
+
     }
 
     private FormLayout crearFormulario() {
 
-        nombreCliente.setEnabled(false);
+        totalPrestamo.setWidth("30%");
+        montoCuota.setWidth("30%");
+        tasaDeIntere.setWidth("30%");
+        montoIntere.setWidth("35%");
+        montoPrestado.setWidth("35%");
 
-        HorizontalLayout hlValor = new HorizontalLayout(montoCuota, tasaDeIntere);
+//        btnCalcular.setWidth("40px");
+//        montoPrestado.setEnabled(false);
+        HorizontalLayout hlValor = new HorizontalLayout(montoCuota, tasaDeIntere, totalPrestamo);
         HorizontalLayout hlCliente = new HorizontalLayout(nombreCliente, buscarClienteBtn);
         HorizontalLayout hlPeriodo = new HorizontalLayout(periodo, cantidadPeriodoField);
-        HorizontalLayout hlMonto = new HorizontalLayout(montoPrestado, montoIntere);
+        HorizontalLayout hlMonto = new HorizontalLayout(montoPrestado, montoIntere, btnCalcular);
         HorizontalLayout hlFecha = new HorizontalLayout(fechaInicio, fechaPrimerPago);
 
         nombreCliente.setSizeFull();
 //        hlPeriodo.setSizeFull();
 
-        hlCliente.setSpacing(false);
+        hlValor.setSpacing("1%");
+        hlCliente.setSpacing("1%");
+        hlMonto.setSpacing("1%");
+
+        hlValor.setAlignItems(Alignment.BASELINE);
         hlCliente.setAlignItems(Alignment.BASELINE);
         hlPeriodo.setAlignItems(Alignment.BASELINE);
         hlMonto.setAlignItems(Alignment.BASELINE);
         hlFecha.setAlignItems(Alignment.BASELINE);
-        hlValor.setAlignItems(Alignment.BASELINE);
 
         FormLayout formLayout = new FormLayout(
                 hlCliente,
@@ -147,20 +156,28 @@ public class PrestamoView extends VerticalLayout {
                 hlPeriodo,
                 hlMonto,
                 hlValor,
-//                totalPrestamo,
                 hlFecha,
-                new HorizontalLayout(guardar, limpiar, btnCalcular)
+                new HorizontalLayout(btnGuardar, btnLimpiar)
         );
+
+//        formLayout.setResponsiveSteps(
+//            new FormLayout.ResponsiveStep("0", 1),
+//            new FormLayout.ResponsiveStep("600px", 2)
+//        );
         return formLayout;
     }
 
     private void configurarGrid() {
 
-//        grid.setSizeFull();
+        grid.addColumn(p -> p.getCodigo()).setHeader("Prestamo").setAutoWidth(true);
         grid.addColumn(p -> p.getCliente() != null ? p.getCliente().getNombre() : "").setHeader("Cliente").setAutoWidth(true);
         grid.addColumn(Prestamo::getNombreTipoPrestamo).setHeader("Tipo Prestamo").setAutoWidth(true);
         grid.addColumn(Prestamo::getMontoPrestado).setHeader("Monto Prestado").setAutoWidth(true);
+        grid.addColumn(Prestamo::getMontoIntere).setHeader("Monto Interes").setAutoWidth(true);
         grid.addColumn(Prestamo::getTotal).setHeader("Total Prestamo").setAutoWidth(true);
+        grid.addColumn(Prestamo::getTotalPagado).setHeader("Total Pagado").setAutoWidth(true);
+        grid.addColumn(Prestamo::getTotalPendiente).setHeader("Total Pendiente").setAutoWidth(true);
+        grid.addColumn(Prestamo::getMontoCuota).setHeader("Valor Cuota").setAutoWidth(true);
         grid.addColumn(Prestamo::getFechaInicio).setHeader("Fecha Inicio").setAutoWidth(true);
         grid.addColumn(Prestamo::getFechaPrimerPago).setHeader("Fecha Primer Pago").setAutoWidth(true);
         grid.addColumn(Prestamo::getNombrePeriodo).setHeader("Periodo").setAutoWidth(true);
@@ -172,23 +189,83 @@ public class PrestamoView extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(event -> {
 
             if (event.getValue() != null) {
-                
+
                 prestamo = event.getValue();
-                
+
+                Double montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
+
                 binder.readBean(prestamo);
-                guardar.setEnabled(true);
-                
+
+                if (montoPagado > 0) {
+                    btnGuardar.setEnabled(false);
+                } else {
+                    btnGuardar.setEnabled(true);
+                }
+
             } else {
-                guardar.setEnabled(false);
+                btnGuardar.setEnabled(false);
             }
 
         });
+
+        grid.addComponentColumn(prest -> {
+
+            Button btnAnular = new Button(VaadinIcon.CLOSE.create(), event -> {
+
+                try {
+
+                    if (prest != null) {
+                        prestamo = prest;
+                        Double montoPagado;
+                        montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
+
+                        if (montoPagado > 0) {
+                            Notification.show("No puede anular un prestamo"
+                                    + " que tenga pagos", 3000, Notification.Position.TOP_CENTER);
+                            return;
+                        }
+
+                        ConfirmDialog dialog = new ConfirmDialog(
+                                "¿Estás seguro que quiere anular el prestamo -> " + prest.getCodigo(),
+                                () -> {
+
+                                    prest.setAnulado(true);
+                                    prest.setFechaAnulado(new Date());
+                                    prest.setAnuladoPor("ADMIN");
+
+                                    prestamoService.guardar(prestamo);
+
+                                    actualizarGrid();
+                                    Notification.show("Prestamo"
+                                            + ""
+                                            + " anulado exitosamente", 3000, Notification.Position.TOP_CENTER);
+
+                                },
+                                () -> {
+
+                                }
+                        );
+                        dialog.open();
+
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Notification.show("Error anulando el prestamo", 3000, Notification.Position.TOP_CENTER);
+                }
+            });
+
+            return btnAnular;
+        }).setHeader("Anular");
+
     }
 
     private void configurarEventos() {
 
-        guardar.addClickListener(e -> {
+        btnGuardar.addClickListener(e -> {
+
             try {
+
                 prestamo.setNombrePeriodo(periodo.getValue().getNombre());
                 prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
                 prestamo.setCreadoPor("ADMIN");
@@ -209,13 +286,13 @@ public class PrestamoView extends VerticalLayout {
 
         buscarClienteBtn.addClickListener(e -> {
 
-            List<Cliente> clientes = clienteService.getLista(); // Ajusta según tu servicio real
+            List<Cliente> clientes = clienteService.getLista(true); // Ajusta según tu servicio real
             ClienteSelectorDialog dialog = new ClienteSelectorDialog(clientes, cliente -> {
 
                 if (cliente != null) {
-                    guardar.setEnabled(true);
+                    btnGuardar.setEnabled(true);
                 } else {
-                    guardar.setEnabled(false);
+                    btnGuardar.setEnabled(false);
                 }
                 nombreCliente.setValue(cliente.getNombre());
                 prestamo.setCliente(cliente); // Enlazar al objeto Prestamo
@@ -224,24 +301,24 @@ public class PrestamoView extends VerticalLayout {
             dialog.open();
         });
 
-        btnCalcular.addClickListener(e -> {
+        btnCalcular.addClickListener((ClickEvent<Button> e) -> {
 
-            Double montoCuota = 0.00, tasaIntere = 0.00, montoPrestado = 0.00, montoIntere = 0.00;
+            Double montoCuot = 0.00, tasaIntere = 0.00, montoPrestad = 0.00, montoInter = 0.00;
             Integer canPeriodo = Integer.valueOf(cantidadPeriodoField.getValue());
 
-            montoPrestado = this.montoPrestado.getValue();
-            montoIntere = this.montoIntere.getValue();
+            montoPrestad = this.montoPrestado.getValue();
+            montoInter = this.montoIntere.getValue();
 
-            montoCuota = ClaseUtil.FormatearDouble((montoPrestado + montoIntere) / canPeriodo, 2);
+            montoCuot = ClaseUtil.FormatearDouble((montoPrestad + montoInter) / canPeriodo, 2);
 
-            tasaIntere = ClaseUtil.FormatearDouble((montoIntere / montoPrestado) * 100, 2);
+            tasaIntere = ClaseUtil.FormatearDouble((montoInter / montoPrestad) * 100, 2);
             tasaDeIntere.setValue(tasaIntere);
-            this.montoCuota.setValue(montoCuota);
-            totalPrestamo.setValue(montoIntere + montoPrestado);
+            this.montoCuota.setValue(montoCuot);
+            totalPrestamo.setValue(montoInter + montoPrestad);
 
         });
 
-        limpiar.addClickListener(e -> limpiarFormulario());
+        btnLimpiar.addClickListener(e -> limpiarFormulario());
     }
 
     private void actualizarGrid() {
@@ -249,8 +326,50 @@ public class PrestamoView extends VerticalLayout {
     }
 
     private void limpiarFormulario() {
-        guardar.setEnabled(false);
+
+        btnGuardar.setEnabled(false);
         prestamo = new Prestamo();
         binder.readBean(prestamo);
+    }
+
+    private void confiBinder() {
+
+// Cliente (solo texto)
+        binder.forField(nombreCliente)
+                .asRequired("El nombre del cliente es obligatorio")
+                .bind(Prestamo::getNombreCliente, Prestamo::setNombreCliente);
+
+// Monto prestado
+        binder.forField(montoPrestado)
+                .asRequired("El monto prestado es obligatorio")
+                .bind(Prestamo::getMontoPrestado, Prestamo::setMontoPrestado);
+
+// Total del préstamo
+        binder.forField(totalPrestamo)
+                .asRequired("El total del préstamo es obligatorio")
+                .bind(Prestamo::getTotal, Prestamo::setTotal);
+
+// Monto del interés
+        binder.forField(montoIntere)
+                .asRequired("El monto de interés es obligatorio")
+                .bind(Prestamo::getMontoIntere, Prestamo::setMontoIntere);
+
+// Tasa de interés
+        binder.forField(tasaDeIntere)
+                .asRequired("La tasa de interés es obligatoria")
+                .bind(Prestamo::getTasaDeIntere, Prestamo::setTasaDeIntere);
+
+// Monto de la cuota
+        binder.forField(montoCuota)
+                .asRequired("El monto de la cuota es obligatorio")
+                .bind(Prestamo::getMontoCuota, Prestamo::setMontoCuota);
+
+// Cantidad de periodos (como texto, puede convertirse si es numérico)
+        binder.forField(cantidadPeriodoField)
+                .withNullRepresentation("") // trata el string vacío como null
+                .withConverter(
+                        new StringToIntegerConverter("Debe ser un número entero")) // conversión segura
+                .bind(Prestamo::getCantidadPeriodo, Prestamo::setCantidadPeriodo);
+
     }
 }

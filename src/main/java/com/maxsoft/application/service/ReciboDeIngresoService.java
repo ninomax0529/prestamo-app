@@ -16,7 +16,9 @@ public interface ReciboDeIngresoService {
     ReciboDeIngreso guardar(ReciboDeIngreso obj);
 
     List<ReciboDeIngreso> getLista();
-    
+
+    public List<ReciboDeIngreso> getLista(boolean estado);
+
     public Integer getCantidadPago(int op);
 
 }
