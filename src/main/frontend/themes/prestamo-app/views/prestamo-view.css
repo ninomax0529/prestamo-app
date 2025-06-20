@@ -1,52 +1,101 @@
 .medicamento-view ol {
-  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
 }
 
 .medicamento-view li {
-  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  transition-property: background-color, box-shadow;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition-property: background-color, box-shadow;
 }
 
 .medicamento-view li:hover {
-  background-color: var(--lumo-base-color);
-  box-shadow: var(--lumo-box-shadow-s);
+    background-color: var(--lumo-base-color);
+    box-shadow: var(--lumo-box-shadow-s);
 }
 
 
 .boton-buscar {
-  background-color: #0d6efd; /* azul tipo Bootstrap */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
+    background-color: #0d6efd; /* azul tipo Bootstrap */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 
 .boton-buscar:hover {
-  background-color: #0b5ed7;
+    background-color: #0b5ed7;
 }
 
 .boton-buscar vaadin-icon {
-  width: 16px;
-  height: 16px;
+    width: 16px;
+    height: 16px;
 }
 
 .boton-calcular {
-  background-color: #17a2b8; /* azul tipo info */
-  color: white;
-  border-radius: 6px;
-  padding: 5px 12px;
-   font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
+    background-color: #17a2b8; /* azul tipo info */
+    color: white;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
 }
+
+
+
+/* Toolbar */
+.buttons-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Tamaño compacto y esquinas redondeadas */
+vaadin-button.guardar,
+vaadin-button.nuevo,
+vaadin-button.cancelar {
+    font-size: 13px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* Guardar */
+vaadin-button.guardar {
+    background-color: var(--lumo-success-color);
+    color: white;
+}
+vaadin-button.guardar:hover {
+    background-color: var(--lumo-success-color-50pct);
+}
+
+/* Nuevo */
+vaadin-button.nuevo {
+    background-color: var(--lumo-primary-color);
+    color: white;
+}
+vaadin-button.nuevo:hover {
+    background-color: var(--lumo-primary-color-50pct);
+}
+
+/* Cancelar */
+vaadin-button.cancelar {
+    background-color: var(--lumo-error-color);
+    color: white;
+}
+vaadin-button.cancelar:hover {
+    background-color: var(--lumo-error-color-50pct);
+}
+

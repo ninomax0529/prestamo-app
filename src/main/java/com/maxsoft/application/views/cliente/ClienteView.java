@@ -5,29 +5,19 @@
 package com.maxsoft.application.views.cliente;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.vaadin.flow.component.notification.Notification;
 
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.service.ClienteService;
-import com.maxsoft.application.service.PrestamoService;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.maxsoft.application.util.NavigationContext;
+import com.maxsoft.application.views.componente.ToolBarBotonera;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
@@ -39,39 +29,31 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 public class ClienteView extends VerticalLayout {
 
     private final ClienteService clienteService;
-    private final PrestamoService prestamoService;
+     private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
 
-    private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-    private final Binder<Cliente> binder = new Binder<>(Cliente.class);
+    ToolBarBotonera botonera = new ToolBarBotonera(true, false, false);
 
-    private final TextField nombre = new TextField("Nombre y Apellidos");
-    private final TextField cedula = new TextField("No.Cédula");
-    private final TextField celular = new TextField("No.Celular");
-    private final TextField direccion = new TextField("Dirección");
-    private final TextField lugarDeTrabajo = new TextField("Lugar de Trabajo");
-    private final TextField referencia = new TextField("Referencia");
-    private final Checkbox habilitado = new Checkbox("Habilitado");
-
-    private final Button guardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
-    private final Button limpiar = new Button("Limpiar", new Icon(VaadinIcon.ERASER));
-    Button exportarPdf = new Button("Exportar a PDF", VaadinIcon.FILE_PRESENTATION.create());
-
-    private Cliente clienteActual = new Cliente();
 
     @Autowired
-    public ClienteView(ClienteService clienteService, PrestamoService prestamoService) {
+    public ClienteView(ClienteService clienteService) {
         this.clienteService = clienteService;
-        this.prestamoService = prestamoService;
+     
+//        add(new H3("Gestión de Clientes"));
 
-        add(new H3("Gestión de Clientes"));
+        botonera.getNuevo().addClickListener(e -> {
+            // lógica de nuevo
+
+            String key = NavigationContext.store(new Cliente());
+            UI.getCurrent().navigate(RegistroClienteView.class, key);
+
+        });
 
         configurarGrid();
-        configurarFormulario();
-        actualizarLista();
-//        exportarPdf.addClickListener(e -> exportarClientesPDF());
 
-        add(grid);
+        actualizarLista();
+
+
+        add(botonera,grid);
     }
 
     private void configurarGrid() {
@@ -82,75 +64,22 @@ public class ClienteView extends VerticalLayout {
         grid.addColumn(Cliente::getCelular).setHeader("Celular").setAutoWidth(true);
         grid.addColumn(Cliente::getDireccion).setHeader("Dirección").setAutoWidth(true);
         grid.addColumn(Cliente::getLugarDeTrabajo).setHeader("Lugar de Trabajo").setAutoWidth(true);
-        grid.addColumn(Cliente::getReferencia).setHeader("Referencia").setAutoWidth(true);
-        grid.addColumn(cliente -> dateFormat.format(cliente.getFechaCreacion())).setHeader("Fecha de Creación").setAutoWidth(true);
-        grid.addColumn(Cliente::getCreadoPor).setHeader("Creado Por").setAutoWidth(true);
-//        grid.addColumn(cliente -> cliente.getFechaActualizacion() != null ? dateFormat.format(cliente.getFechaActualizacion()) : "").setHeader("Fecha de Actualización").setAutoWidth(true);
-//        grid.addColumn(Cliente::getActualizadoPor).setHeader("Actualizado Por").setAutoWidth(true);
+
         grid.addColumn(cliente -> cliente.getHabilitado() ? "Sí" : "No").setHeader("Habilitado").setAutoWidth(true);
 
-        grid.asSingleSelect().addValueChangeListener(event -> editarCliente(event.getValue()));
-    }
+        grid.addComponentColumn(cliente -> {
 
-    private void configurarFormulario() {
+            Button editar = new Button("Editar ", event -> {
 
-        FormLayout form = new FormLayout();
-        habilitado.setValue(Boolean.TRUE);
-        form.add(nombre, cedula, celular, direccion, lugarDeTrabajo, referencia, habilitado);
+                String key = NavigationContext.store(cliente);
 
-        binder.bindInstanceFields(this);
+                UI.getCurrent().navigate(RegistroClienteView.class, key);
 
-        guardar.addClickListener(e -> guardarCliente());
+            });
 
-        limpiar.addClickListener(e -> limpiarFormulario());
-
-        HorizontalLayout botones = new HorizontalLayout(guardar, limpiar);
-        add(form, botones);
-
-    }
-
-    private void limpiarFormulario() {
-
-        clienteActual = new Cliente();
-        binder.readBean(clienteActual);
-        habilitado.setValue(Boolean.TRUE);
-    }
-
-    private void editarCliente(Cliente cliente) {
-        if (cliente != null) {
-            this.clienteActual = cliente;
-            binder.readBean(cliente);
-            Double totalPendiente = prestamoService
-                    .getPrestamoPendiente(cliente.getCodigo());
-
-            if (totalPendiente != null) {
-                if (totalPendiente > 0) {
-                    habilitado.setEnabled(false);
-                } else {
-                    habilitado.setEnabled(true);
-                }
-
-            }else{
-                   habilitado.setEnabled(true);
-            }
-        }
-    }
-
-    private void guardarCliente() {
-
-        try {
-
-            binder.writeBean(clienteActual);
-            clienteActual.setFechaActualizacion(new Date());
-            clienteActual.setFechaCreacion(new Date());
-            clienteService.guardar(clienteActual);
-            actualizarLista();
-            Notification.show("Cliente guardado", 2000, Notification.Position.TOP_CENTER);
-            clienteActual = new Cliente();
-            binder.readBean(clienteActual);
-        } catch (ValidationException e) {
-            Notification.show("Error al guardar cliente: " + e.getMessage(), 2000, Notification.Position.BOTTOM_START);
-        }
+            return new HorizontalLayout(editar);
+        }).setHeader("Acciones");
+        
     }
 
     private void actualizarLista() {

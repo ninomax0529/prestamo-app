@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.service;
 
+import com.maxsoft.application.modelo.DetallePrestamo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.repo.PrestamoRepo;
 import java.util.List;
@@ -57,6 +58,14 @@ public class PrestamoServiceImpl implements PrestamoService {
 
         Double monto = repo.getPrestamoPendiente(codCliente);
         return monto;
+    }
+
+    @Override
+    public List<DetallePrestamo> getDetallePrestamo(int codPrestamo) {
+      
+        List<DetallePrestamo> lista=repo.getDetallePrestamo(codPrestamo);
+        
+        return lista;
     }
 
 }

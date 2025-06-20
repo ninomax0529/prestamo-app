@@ -112,6 +112,8 @@ public class Prestamo implements Serializable {
     private TipoPrestamo tipoPrestamo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prestamo")
     private Collection<ReciboDeIngreso> reciboDeIngresoCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prestano")
+    private Collection<DetallePrestamo> detallePrestamoCollection;
 
     public Prestamo() {
     }
@@ -332,6 +334,15 @@ public class Prestamo implements Serializable {
 
     public void setReciboDeIngresoCollection(Collection<ReciboDeIngreso> reciboDeIngresoCollection) {
         this.reciboDeIngresoCollection = reciboDeIngresoCollection;
+    }
+
+    @XmlTransient
+    public Collection<DetallePrestamo> getDetallePrestamoCollection() {
+        return detallePrestamoCollection;
+    }
+
+    public void setDetallePrestamoCollection(Collection<DetallePrestamo> detallePrestamoCollection) {
+        this.detallePrestamoCollection = detallePrestamoCollection;
     }
 
     @Override

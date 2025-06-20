@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.service;
 
+import com.maxsoft.application.modelo.DetallePrestamo;
 import com.maxsoft.application.modelo.Prestamo;
 import java.util.List;
 
@@ -24,4 +25,5 @@ public interface PrestamoService {
     Double getMontoPagado(int codPrestamo);
 
     Double getPrestamoPendiente(int codCliente);
+    List<DetallePrestamo> getDetallePrestamo(int codPrestamo);
 }

@@ -11,8 +11,11 @@ import com.maxsoft.application.reporte.RptReciboIngreso;
 import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.ReciboDeIngresoService;
 import com.maxsoft.application.util.ClaseUtil;
+import com.maxsoft.application.util.NavigationContext;
+import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.maxsoft.application.views.dialogo.ConfirmDialog;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -69,6 +72,8 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
     private final Button btnGuardar = new Button("Guardar");
     private final Button limpiar = new Button("Limpiar");
+    ToolBarBotonera botonera = new ToolBarBotonera(true, false, false);
+
     Button buscarPrestamo = new Button(new Icon(VaadinIcon.SEARCH));
     private ReciboDeIngreso reciboActual;
     Cliente cliente;
@@ -84,7 +89,15 @@ public class ReciboDeIngresoView extends VerticalLayout {
         configureGrid();
 //        configureForm();
         buscarPrestamo.addClassName("boton-buscar");
-        add(new H3("Gestión de Cobros"), crearFormulario(), grid);
+        botonera.getNuevo().addClickListener(e -> {
+            // lógica de nuevo
+
+            String key = NavigationContext.store(new ReciboDeIngreso());
+            UI.getCurrent().navigate(RegistroReciboDeIngresoView.class, key);
+
+        });
+
+        add(botonera, grid);
         actualizarGrid();
 
         buscarPrestamo.addClickListener(e -> {

@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.repo;
 
+import com.maxsoft.application.modelo.DetallePrestamo;
 import com.maxsoft.application.modelo.Prestamo;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,14 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
 
     @Query(value = strPrestamo, nativeQuery = true)
     public List<Prestamo> getPrestamoPendiente();
+    
+        String    strDetPrestamo = """
+                      select * from  detalle_prestamo  d
+                       where 
+                       d.prestamo=:codPrestamo """;
+
+    @Query(value = strDetPrestamo, nativeQuery = true)
+    public List<DetallePrestamo> getDetallePrestamo(@Param("codPrestamo") int codPrestamo);
 
     String strMontPendiente = """
                                
