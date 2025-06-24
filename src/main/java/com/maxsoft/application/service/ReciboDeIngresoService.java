@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.service;
 
+import com.maxsoft.application.modelo.DetalleReciboDeIngreso;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
 import java.util.List;
 
@@ -20,5 +21,7 @@ public interface ReciboDeIngresoService {
     public List<ReciboDeIngreso> getLista(boolean estado);
 
     public Integer getCantidadPago(int op);
+    
+        List<DetalleReciboDeIngreso> getDetalleRecibo(int codRecibo);
 
 }

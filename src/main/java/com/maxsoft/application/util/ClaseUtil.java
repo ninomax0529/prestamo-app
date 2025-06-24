@@ -29,7 +29,7 @@ public class ClaseUtil {
 
     private static SimpleDateFormat sdfH = new SimpleDateFormat("HH:mm");
     private static SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-       private static SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
+    private static SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
     private static DecimalFormat df = new DecimalFormat("###,###,###.00");
 
     public ClaseUtil() {
@@ -51,7 +51,8 @@ public class ClaseUtil {
         return sdf2.format(fecha);
 
     }
-      public static String formatoFechaLocal(Date fecha) {
+
+    public static String formatoFechaLocal(Date fecha) {
 
         return sdf3.format(fecha);
 
@@ -279,6 +280,29 @@ public class ClaseUtil {
         System.out.println("Segundo: " + segundos);
 
         return hora;
+    }
+
+    public static Date Fechadiadespues(Date jXDatePicker1, int suma) {
+
+        SimpleDateFormat fmt;
+        Calendar cal = Calendar.getInstance();
+        Date posterior;
+
+        fmt = new SimpleDateFormat("dd-MM-yyyy");
+        cal.setTimeInMillis(jXDatePicker1.getTime());
+        int anio = cal.get(Calendar.YEAR);
+        int mes = cal.get(Calendar.MONTH);
+        int dia = cal.get(Calendar.DAY_OF_MONTH);
+        dia += suma;
+        //System.out.println("DIA: "+dia+"MES: "+mes+"AÑO: "+anio);
+        cal.set(Calendar.YEAR, anio);
+        cal.set(Calendar.MONTH, mes);
+        cal.set(Calendar.DAY_OF_MONTH, dia);
+
+        fmt.setCalendar(cal);
+        posterior = new Date(fmt.getCalendar().getTimeInMillis());
+        //System.out.println("FECHA RETORNO: "+posterior);
+        return posterior;
     }
 
     public static void main(String[] args) {

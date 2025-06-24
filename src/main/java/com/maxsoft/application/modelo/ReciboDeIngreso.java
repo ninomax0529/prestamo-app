@@ -5,6 +5,7 @@
 package com.maxsoft.application.modelo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,13 +15,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -67,7 +71,7 @@ public class ReciboDeIngreso implements Serializable {
     @Column(name = "fecha_anulado")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaAnulado;
-    @Size(max = 45)
+    @Size(max = 150)
     @Column(name = "descripcion_pago")
     private String descripcionPago;
     @JoinColumn(name = "cliente", referencedColumnName = "codigo")
@@ -76,6 +80,8 @@ public class ReciboDeIngreso implements Serializable {
     @JoinColumn(name = "prestamo", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
     private Prestamo prestamo;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recibo")
+    private Collection<DetalleReciboDeIngreso> detalleReciboDeIngresoCollection;
 
     public ReciboDeIngreso() {
     }
@@ -191,6 +197,15 @@ public class ReciboDeIngreso implements Serializable {
 
     public void setPrestamo(Prestamo prestamo) {
         this.prestamo = prestamo;
+    }
+
+    @XmlTransient
+    public Collection<DetalleReciboDeIngreso> getDetalleReciboDeIngresoCollection() {
+        return detalleReciboDeIngresoCollection;
+    }
+
+    public void setDetalleReciboDeIngresoCollection(Collection<DetalleReciboDeIngreso> detalleReciboDeIngresoCollection) {
+        this.detalleReciboDeIngresoCollection = detalleReciboDeIngresoCollection;
     }
 
     @Override

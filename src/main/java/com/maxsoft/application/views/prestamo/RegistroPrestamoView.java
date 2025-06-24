@@ -4,7 +4,6 @@
  */
 package com.maxsoft.application.views.prestamo;
 
-import com.lowagie.text.pdf.PRStream;
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.DetallePrestamo;
 import com.maxsoft.application.modelo.Periodo;
@@ -26,7 +25,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -99,7 +97,28 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
         botonera.getGuardar().addClickListener(e -> {
             // lógica de guardar
 
-            guardar();
+//           if (binder.validate().isOk()) {
+//                   Notification.show("Faltan datos por registrar  "
+//                            , 3000, Notification.Position.TOP_CENTER);
+//                 return;
+//             }
+           
+            ConfirmDialog dialog = new ConfirmDialog(
+                    "¿Estás seguro que quiere guardar el prestamo -> ",
+                    () -> {
+                        guardar();
+
+                        Notification.show("Prestamo"
+                                + ""
+                                + " guardado exitosamente", 3000, Notification.Position.TOP_CENTER);
+
+                    },
+                    () -> {
+
+                    }
+            );
+            dialog.open();
+
         });
 
         botonera.getCancelar().addClickListener(e -> {
@@ -231,6 +250,8 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
             montoPrestad = this.montoPrestado.getValue();
             montoInter = this.montoIntere.getValue();
+            prestamo.setTotalPagado(0.00);
+            prestamo.setTotalPendiente(montoPrestad);
 
             montoCuot = ClaseUtil.FormatearDouble((montoPrestad + montoInter) / canPeriodo, 2);
 
@@ -238,8 +259,8 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             tasaDeIntere.setValue(tasaIntere);
             this.montoCuota.setValue(montoCuot);
             totalPrestamo.setValue(montoInter + montoPrestad);
-          
-            prestamo.setDetallePrestamoCollection(  crearDetalle(canPeriodo, montoCuot));
+
+            prestamo.setDetallePrestamoCollection(crearDetalle(canPeriodo, montoCuot));
 
         });
 
@@ -324,13 +345,14 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             prestamo.setNombrePeriodo(periodo.getValue().getNombre());
             prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
             prestamo.setCreadoPor("ADMIN");
-            prestamo.setFechaCreacion(new Date());
+            prestamo.setFechaCreacion(new Date());         
+            prestamo.setTotalPendiente(prestamo.getMontoPrestado());
             binder.writeBean(prestamo);
 
             prestamoService.guardar(prestamo);
 
             actualizarGrid();
-            Notification.show("Préstamo guardado");
+         
             limpiarFormulario();
         } catch (ValidationException ex) {
             Notification.show("Datos inválidos: " + ex.getMessage());
@@ -342,6 +364,12 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
         List<DetallePrestamo> lista = new ArrayList<>();
         DetallePrestamo det;
 
+        Date fecha = null;
+
+        fecha = ClaseUtil.asDate(fechaPrimerPago.getValue());
+        prestamo.setFechaPrimerPago(fecha);
+        prestamo.setPeriodo(periodo.getValue());
+
         for (int i = 1; i <= canCuota; i++) {
 
             det = new DetallePrestamo();
@@ -349,12 +377,43 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             det.setConcepto("pago");
             det.setValorCuota(valorCuota);
             det.setEstado(true);
-            det.setFecha(new Date());
+
             det.setFechaAplicado(new Date());
-            det.setMontoPagado(valorCuota);
-            det.setMontoPendiente(0);
-            det.setPrestano(prestamo);
+            det.setMontoPagado(0.00);
+            det.setMontoPendiente(valorCuota);
+            det.setPrestamo(prestamo);
             det.setNumeroCuota(i);
+            det.setFecha(fecha);
+            det.setEstado(false);
+
+            if (null != prestamo.getPeriodo().getCodigo()) {
+
+                switch (prestamo.getPeriodo().getCodigo()) {
+                    case 5 -> {
+                        fecha = ClaseUtil.Fechadiadespues(fecha, 1);
+                        System.out.println("Fecha diario " + fecha);
+                        break;
+                    }
+                    case 6 -> {
+                        fecha = ClaseUtil.Fechadiadespues(fecha, 7);
+                        System.out.println("Fecha semanal " + fecha);
+                        break;
+                    }
+                    case 7 -> {
+                        fecha = ClaseUtil.Fechadiadespues(fecha, 15);
+                        System.out.println("Fecha quincenal " + fecha);
+                        break;
+                    }
+                    case 8 -> {
+                        fecha = ClaseUtil.Fechadiadespues(fecha, 30);
+                        System.out.println("Fecha mensual " + fecha);
+                        break;
+                    }
+                    default -> {
+                    }
+                }
+            }
+
             lista.add(det);
 
         }

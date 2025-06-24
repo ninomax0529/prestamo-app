@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.service;
 
+import com.maxsoft.application.modelo.DetalleReciboDeIngreso;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
 import com.maxsoft.application.repo.ReciboDeIngresoRepo;
 import java.util.List;
@@ -45,6 +46,14 @@ public class ReciboDeIngresoServiceImpl implements ReciboDeIngresoService {
 
         return lista;
 
+    }
+
+    @Override
+    public List<DetalleReciboDeIngreso> getDetalleRecibo(int codRecibo) {
+       
+        List<DetalleReciboDeIngreso> lista = repo.getDetalleRecibo(codRecibo);
+
+        return lista;
     }
 
 }

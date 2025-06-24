@@ -5,23 +5,22 @@
 package com.maxsoft.application.views.reciboIngreso;
 
 import com.maxsoft.application.modelo.Cliente;
+import com.maxsoft.application.modelo.DetallePrestamo;
+import com.maxsoft.application.modelo.DetalleReciboDeIngreso;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
-import com.maxsoft.application.reporte.RptReciboIngreso;
 import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.ReciboDeIngresoService;
 import com.maxsoft.application.util.ClaseUtil;
 import com.maxsoft.application.util.NavigationContext;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
-import com.maxsoft.application.views.dialogo.ConfirmDialog;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -32,6 +31,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
@@ -43,10 +43,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
-import java.sql.Connection;
 import java.time.LocalDate;
-import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Set;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @Route(value = "/registroRecibos")
@@ -55,12 +54,9 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @PermitAll
 public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUrlParameter<String> {
 
-    @Autowired
-    DataSource dataSource;
     private final ReciboDeIngresoService reciboService;
     private final PrestamoService prestamoService;
 
-    private final Grid<ReciboDeIngreso> grid = new Grid<>(ReciboDeIngreso.class, false);
     private final Binder<ReciboDeIngreso> binder = new Binder<>(ReciboDeIngreso.class);
 
     private final DatePicker dpFecha = new DatePicker("Fecha");
@@ -76,6 +72,9 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
     private final Button limpiar = new Button("Limpiar");
     Button buscarPrestamo = new Button(new Icon(VaadinIcon.SEARCH));
     ToolBarBotonera botonera = new ToolBarBotonera(false, true, true);
+    private final Grid<DetallePrestamo> gridDetPrestamo = new Grid<>(DetallePrestamo.class, false);
+       ListDataProvider<DetallePrestamo> dataProvider ;
+
     private ReciboDeIngreso reciboActual;
     Cliente cliente;
     Prestamo prestamo;
@@ -84,8 +83,12 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
     public RegistroReciboDeIngresoView(ReciboDeIngresoService reciboService, PrestamoService prestamoService) {
         this.reciboService = reciboService;
         this.prestamoService = prestamoService;
+        addClassName("prestamo-view");
 
+        setSizeFull();
+        setPadding(true);
         setSpacing(false);
+        configurarGridDetPrestamo();
 
         buscarPrestamo.addClassName("boton-buscar");
 
@@ -104,7 +107,42 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
             buscarPrestamo();
         });
 
-        add(botonera, crearFormulario());
+        add(botonera, crearFormulario(), gridDetPrestamo);
+
+    }
+
+    private void configurarGridDetPrestamo() {
+
+        gridDetPrestamo.addColumn(DetallePrestamo::getFecha).setHeader("Fecha").setWidth("120px");
+        gridDetPrestamo.addColumn(DetallePrestamo::getNumeroCuota).setHeader("Numero").setWidth("88px");
+        gridDetPrestamo.addColumn(DetallePrestamo::getValorCuota).setHeader("Cuota").setWidth("95px");
+        gridDetPrestamo.addColumn(DetallePrestamo::getMontoPagado).setHeader("Pagado");
+        gridDetPrestamo.addColumn(DetallePrestamo::getMontoPendiente).setHeader("Pendiente");
+//
+//        gridDetPrestamo.addComponentColumn(p -> {
+//            Icon icon = p.getEstado() ? VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create();
+//            icon.setColor(p.getEstado() ? "green" : "red");
+//            return icon;
+//        }).setHeader("Saldada").setAutoWidth(true);
+
+        gridDetPrestamo.addComponentColumn(p -> {
+
+            Checkbox checkbox = new Checkbox(false);
+
+            checkbox.addValueChangeListener(event -> {
+
+                boolean nuevoEstado = event.getValue();
+                p.setEstado(nuevoEstado);
+
+                crearDetalle();
+               
+            });
+
+//            checkbox.setReadOnly(true);
+            return checkbox;
+        }).setHeader("Pagar");
+
+        gridDetPrestamo.setSizeFull();
 
     }
 
@@ -164,16 +202,17 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
             montoPend = montoPend - reciboActual.getTotal();
 
             reciboActual.setMontoPendiente(montoPend);
+            reciboActual.setDetalleReciboDeIngresoCollection(crearDetalle());
 
             reciboService.guardar(reciboActual);
 
             montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
             prestamo.setTotalPagado(montoPagado);
             prestamo.setTotalPendiente(montoPend);
+            prestamo.setDetallePrestamoCollection(dataProvider.getItems());
 
             prestamoService.guardar(prestamo);
 
-            actualizarGrid();
             limpiarFormulario();
         } catch (ValidationException e) {
             e.printStackTrace();
@@ -189,11 +228,6 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         numeroPrestamo.clear();
         binder.readBean(new ReciboDeIngreso());
 
-    }
-
-    private void actualizarGrid() {
-        List<ReciboDeIngreso> lista = reciboService.getLista(false);
-        grid.setItems(lista);
     }
 
     private void editar(ReciboDeIngreso recibo) {
@@ -226,17 +260,60 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
             cliente = seleccionado.getCliente();
             prestamo = seleccionado;
             btnGuardar.setEnabled(true);
+//
+//            StringBuilder descripcion = new StringBuilder();
+//            int canPago = this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
+//
+//            descripcion.append("Pago ").append(canPago)
+//                    .append(" de ").append(prestamo.getCantidadPeriodo());
 
-            StringBuilder descripcion = new StringBuilder();
-            int canPago = this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
+            gridDetPrestamo.setItems(prestamoService.getDetallePrestamo(prestamo.getCodigo(),false));
 
-            descripcion.append("Pago ").append(canPago)
-                    .append(" de ").append(prestamo.getCantidadPeriodo());
-
-            descripcionPago.setValue(descripcion.toString());
+//            descripcionPago.setValue(descripcion.toString());
         });
         dialog.open();
 
+    }
+
+    private List<DetalleReciboDeIngreso> crearDetalle() {
+
+        List<DetalleReciboDeIngreso> lista = new ArrayList<>();
+
+        DetalleReciboDeIngreso det;
+        
+
+       dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
+
+        String descPago = "";
+        for (DetallePrestamo p : dataProvider.getItems()) {
+
+            if (p.getEstado() == true) {
+
+                det = new DetalleReciboDeIngreso();
+                det.setTotal(p.getValorCuota());
+                det.setMontoPendiente(0);
+                det.setRecibo(reciboActual);
+                det.setNumeroCuota(p.getNumeroCuota());
+                StringBuilder builderDescripcion = new StringBuilder();
+
+                int canPago = p.getNumeroCuota();//this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
+
+                builderDescripcion.append("Pago cuota ").append(canPago)
+                        .append(" de ").append(prestamo.getCantidadPeriodo());
+
+                det.setConcepto(builderDescripcion.toString());
+
+                System.out.println("Concepto " + det.getConcepto());
+                descPago+=det.getConcepto()+"\n";
+
+                lista.add(det);
+
+            }
+
+            descripcionPago.setValue(descPago);
+        }
+
+        return lista;
     }
 
 }

@@ -43,28 +43,38 @@ public class PrestamoServiceImpl implements PrestamoService {
     public Double getMontoPendiente(int codPrestamo) {
 
         Double monto = repo.getMontoPendiente(codPrestamo);
-        return monto;
+        return monto==null ? 0.00 : monto;
     }
 
     @Override
     public Double getMontoPagado(int codPrestamo) {
 
         Double monto = repo.getMontoPagado(codPrestamo);
-        return monto;
+        return monto==null ? 0.00 : monto;
     }
 
     @Override
     public Double getPrestamoPendiente(int codCliente) {
 
         Double monto = repo.getPrestamoPendiente(codCliente);
-        return monto;
+        return monto==null ? 0.00 : monto;
     }
 
     @Override
     public List<DetallePrestamo> getDetallePrestamo(int codPrestamo) {
-      
-        List<DetallePrestamo> lista=repo.getDetallePrestamo(codPrestamo);
+
+        List<DetallePrestamo> lista = repo.getDetallePrestamo(codPrestamo);
+
+        return lista;
+    }
+
+    @Override
+    public List<DetallePrestamo> getDetallePrestamo(int codPrestamo, boolean estado) {
+
+        List<DetallePrestamo> lista = repo.getDetallePrestamo(codPrestamo,estado);
         
+        System.out.println("cant "+lista.size());
+
         return lista;
     }
 

@@ -15,24 +15,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *
  * @author Maximiliano
  */
 @Entity
-@Table(name = "detalle_prestamo")
+@Table(name = "detalle_recibo_de_ingreso")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "DetallePrestamo.findAll", query = "SELECT d FROM DetallePrestamo d")})
-public class DetallePrestamo implements Serializable {
+    @NamedQuery(name = "DetalleReciboDeIngreso.findAll", query = "SELECT d FROM DetalleReciboDeIngreso d")})
+public class DetalleReciboDeIngreso implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -42,57 +39,38 @@ public class DetallePrestamo implements Serializable {
     private Integer codigo;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "fecha")
-    @Temporal(TemporalType.DATE)
-    private Date fecha;
-    @Column(name = "fecha_aplicado")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaAplicado;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "numero_cuota")
     private int numeroCuota;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "valor_cuota")
-    private double valorCuota;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "monto_pagado")
-    private double montoPagado;
+    @Column(name = "total")
+    private double total;
     @Basic(optional = false)
     @NotNull
     @Column(name = "monto_pendiente")
     private double montoPendiente;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 45)
+    @Size(min = 1, max = 120)
     @Column(name = "concepto")
     private String concepto;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "estado")
-    private boolean estado;
-    @JoinColumn(name = "prestamo", referencedColumnName = "codigo")
+    @JoinColumn(name = "recibo", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
-    private Prestamo prestamo;
+    private ReciboDeIngreso recibo;
 
-    public DetallePrestamo() {
+    public DetalleReciboDeIngreso() {
     }
 
-    public DetallePrestamo(Integer codigo) {
+    public DetalleReciboDeIngreso(Integer codigo) {
         this.codigo = codigo;
     }
 
-    public DetallePrestamo(Integer codigo, Date fecha, int numeroCuota, double valorCuota, double montoPagado, double montoPendiente, String concepto, boolean estado) {
+    public DetalleReciboDeIngreso(Integer codigo, int numeroCuota, double total, double montoPendiente, String concepto) {
         this.codigo = codigo;
-        this.fecha = fecha;
         this.numeroCuota = numeroCuota;
-        this.valorCuota = valorCuota;
-        this.montoPagado = montoPagado;
+        this.total = total;
         this.montoPendiente = montoPendiente;
         this.concepto = concepto;
-        this.estado = estado;
     }
 
     public Integer getCodigo() {
@@ -103,22 +81,6 @@ public class DetallePrestamo implements Serializable {
         this.codigo = codigo;
     }
 
-    public Date getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
-
-    public Date getFechaAplicado() {
-        return fechaAplicado;
-    }
-
-    public void setFechaAplicado(Date fechaAplicado) {
-        this.fechaAplicado = fechaAplicado;
-    }
-
     public int getNumeroCuota() {
         return numeroCuota;
     }
@@ -127,20 +89,12 @@ public class DetallePrestamo implements Serializable {
         this.numeroCuota = numeroCuota;
     }
 
-    public double getValorCuota() {
-        return valorCuota;
+    public double getTotal() {
+        return total;
     }
 
-    public void setValorCuota(double valorCuota) {
-        this.valorCuota = valorCuota;
-    }
-
-    public double getMontoPagado() {
-        return montoPagado;
-    }
-
-    public void setMontoPagado(double montoPagado) {
-        this.montoPagado = montoPagado;
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     public double getMontoPendiente() {
@@ -159,20 +113,12 @@ public class DetallePrestamo implements Serializable {
         this.concepto = concepto;
     }
 
-    public boolean getEstado() {
-        return estado;
+    public ReciboDeIngreso getRecibo() {
+        return recibo;
     }
 
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
-
-    public Prestamo getPrestamo() {
-        return prestamo;
-    }
-
-    public void setPrestamo(Prestamo prestamo) {
-        this.prestamo = prestamo;
+    public void setRecibo(ReciboDeIngreso recibo) {
+        this.recibo = recibo;
     }
 
     @Override
@@ -185,10 +131,10 @@ public class DetallePrestamo implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DetallePrestamo)) {
+        if (!(object instanceof DetalleReciboDeIngreso)) {
             return false;
         }
-        DetallePrestamo other = (DetallePrestamo) object;
+        DetalleReciboDeIngreso other = (DetalleReciboDeIngreso) object;
         if ((this.codigo == null && other.codigo != null) || (this.codigo != null && !this.codigo.equals(other.codigo))) {
             return false;
         }
@@ -197,7 +143,7 @@ public class DetallePrestamo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.maxsoft.application.modelo.DetallePrestamo[ codigo=" + codigo + " ]";
+        return "com.maxsoft.application.modelo.DetalleReciboDeIngreso[ codigo=" + codigo + " ]";
     }
     
 }

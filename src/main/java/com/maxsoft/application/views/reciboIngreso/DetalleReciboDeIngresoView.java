@@ -2,13 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.maxsoft.application.views.prestamo;
+package com.maxsoft.application.views.reciboIngreso;
 
+import com.maxsoft.application.views.prestamo.*;
 import com.maxsoft.application.modelo.DetallePrestamo;
+import com.maxsoft.application.modelo.DetalleReciboDeIngreso;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.service.ClienteService;
 import com.maxsoft.application.service.PeriodoService;
 import com.maxsoft.application.service.PrestamoService;
+import com.maxsoft.application.service.ReciboDeIngresoService;
 import com.maxsoft.application.service.TipoPrestamoService;
 import com.maxsoft.application.util.NavigationContext;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
@@ -29,39 +32,31 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  *
  * @author Maximiliano
  */
-@Route("/detallePrestamo")
-@PageTitle("Detalle Préstamo")
+@Route("/detalleRecibo")
+@PageTitle("Detalle Recibo")
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-public class DetallePrestamoView extends VerticalLayout implements HasUrlParameter<String> {
+public class DetalleReciboDeIngresoView extends VerticalLayout implements HasUrlParameter<String> {
 
-    private final PrestamoService prestamoService;
-    private final PeriodoService periodoService;
-    private final TipoPrestamoService tipoPrestamoService;
-    private final ClienteService clienteService;
+    private  ReciboDeIngresoService reciboService;
+
     ToolBarBotonera botonera = new ToolBarBotonera(false, false, true);
 
-    private final Grid<DetallePrestamo> grid = new Grid<>(DetallePrestamo.class, false);
+    private final Grid<DetalleReciboDeIngreso> grid = new Grid<>(DetalleReciboDeIngreso.class, false);
 
-    private final Button btnGuardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
-    private final Button btnLimpiar = new Button("Limpiar", VaadinIcon.REFRESH.create());
     Button buscarClienteBtn = new Button(new Icon(VaadinIcon.SEARCH));
     private final Button btnCalcular = new Button("Calcular");
 
-    public DetallePrestamoView(PrestamoService prestamoService, PeriodoService periodoService, TipoPrestamoService tipoPrestamoService,
-            ClienteService clienteService) {
+    public DetalleReciboDeIngresoView(ReciboDeIngresoService reciboService) {
 
         setSizeFull();
         setPadding(true);
         setSpacing(true);
-        this.prestamoService = prestamoService;
-        this.periodoService = periodoService;
-        this.tipoPrestamoService = tipoPrestamoService;
-        this.clienteService = clienteService;
-        btnGuardar.setEnabled(false);
-
+     
+        this.reciboService = reciboService;
+    
         botonera.getCancelar().addClickListener(e -> {
             // lógica de cancelar
-            UI.getCurrent().navigate(PrestamoView.class);
+            UI.getCurrent().navigate(ReciboDeIngresoView.class);
         });
 
         botonera.getNuevo().addClickListener(e -> {
@@ -84,16 +79,11 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
     private void configurarGrid() {
 
-        grid.addColumn(DetallePrestamo::getNumeroCuota).setHeader("Numero").setAutoWidth(true);
-        grid.addColumn(DetallePrestamo::getValorCuota).setHeader("Cuota").setAutoWidth(true);
-        grid.addColumn(DetallePrestamo::getMontoPagado).setHeader("Pagado").setAutoWidth(true);
-        grid.addColumn(DetallePrestamo::getMontoPendiente).setHeader("Pendiente").setAutoWidth(true);
-        grid.addColumn(DetallePrestamo::getFecha).setHeader("Fecha").setAutoWidth(true);
-        grid.addComponentColumn(p -> {
-            Icon icon = p.getEstado() ? VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create();
-            icon.setColor(p.getEstado() ? "green" : "red");
-            return icon;
-        }).setHeader("Estado").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getNumeroCuota).setHeader("Cuota").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getTotal).setHeader("Total").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getMontoPendiente).setHeader("Pemdiente").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getConcepto).setHeader("Concepta").setAutoWidth(true);
+
 
     }
 
@@ -104,7 +94,7 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
         Integer codigo = Integer.valueOf(t);
 
-        grid.setItems(prestamoService.getDetallePrestamo(codigo));
+        grid.setItems(reciboService.getDetalleRecibo(codigo));
     }
 
 }

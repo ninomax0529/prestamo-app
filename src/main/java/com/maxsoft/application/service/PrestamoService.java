@@ -25,5 +25,8 @@ public interface PrestamoService {
     Double getMontoPagado(int codPrestamo);
 
     Double getPrestamoPendiente(int codCliente);
+
     List<DetallePrestamo> getDetallePrestamo(int codPrestamo);
+
+    List<DetallePrestamo> getDetallePrestamo(int codPrestamo, boolean estado);
 }

@@ -112,7 +112,7 @@ public class Prestamo implements Serializable {
     private TipoPrestamo tipoPrestamo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prestamo")
     private Collection<ReciboDeIngreso> reciboDeIngresoCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prestano")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prestamo")
     private Collection<DetallePrestamo> detallePrestamoCollection;
 
     public Prestamo() {

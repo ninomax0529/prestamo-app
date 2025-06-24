@@ -24,14 +24,24 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
 
     @Query(value = strPrestamo, nativeQuery = true)
     public List<Prestamo> getPrestamoPendiente();
-    
-        String    strDetPrestamo = """
+
+    String strDetPrestamo = """
                       select * from  detalle_prestamo  d
                        where 
                        d.prestamo=:codPrestamo """;
 
     @Query(value = strDetPrestamo, nativeQuery = true)
     public List<DetallePrestamo> getDetallePrestamo(@Param("codPrestamo") int codPrestamo);
+
+    String strDetPrestamo1 = """
+                       select * from  detalle_prestamo  d
+                       where 
+                       d.prestamo=:codPrestamo
+                       and d.estado=:estado             
+                             """;
+
+    @Query(value = strDetPrestamo1, nativeQuery = true)
+    public List<DetallePrestamo> getDetallePrestamo(@Param("codPrestamo") int codPrestamo, @Param("estado") boolean estado);
 
     String strMontPendiente = """
                                

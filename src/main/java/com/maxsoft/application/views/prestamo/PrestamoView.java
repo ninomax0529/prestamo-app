@@ -4,7 +4,6 @@
  */
 package com.maxsoft.application.views.prestamo;
 
-import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.Periodo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.TipoPrestamo;
@@ -12,35 +11,22 @@ import com.maxsoft.application.service.ClienteService;
 import com.maxsoft.application.service.PeriodoService;
 import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.TipoPrestamoService;
-import com.maxsoft.application.util.ClaseUtil;
 import com.maxsoft.application.util.NavigationContext;
-import com.maxsoft.application.views.cliente.RegistroClienteView;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
-import com.maxsoft.application.views.dialogo.ClienteSelectorDialog;
 import com.maxsoft.application.views.dialogo.ConfirmDialog;
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.util.Date;
-import java.util.List;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 /**
@@ -219,7 +205,7 @@ public class PrestamoView extends VerticalLayout {
     }
 
     private void limpiarFormulario() {
-
+        
         btnGuardar.setEnabled(false);
         prestamo = new Prestamo();
         binder.readBean(prestamo);

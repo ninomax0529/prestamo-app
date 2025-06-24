@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.views.reciboIngreso;
 
+import com.helger.css.ECSSUnit;
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
@@ -21,7 +22,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -85,6 +85,8 @@ public class ReciboDeIngresoView extends VerticalLayout {
         this.prestamoService = prestamoService;
 
         setSpacing(false);
+        setSizeFull();
+//        grid.setSizeFull();
 //        setSizeFull();
         configureGrid();
 //        configureForm();
@@ -136,9 +138,12 @@ public class ReciboDeIngresoView extends VerticalLayout {
         grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago").setAutoWidth(true);
 
         grid.addComponentColumn(recibo -> {
+            HorizontalLayout acciones = new HorizontalLayout();
 
-            Button btnVer = new Button(VaadinIcon.EYE.create(), event -> {
+            // Botón Ver
+            Button verBtn = new Button(VaadinIcon.EYE.create(), click -> {
 
+                // Aquí puedes abrir un diálogo o navegar
                 try (Connection conn = dataSource.getConnection()) {
 
                     RptReciboIngreso rec = new RptReciboIngreso();
@@ -160,14 +165,27 @@ public class ReciboDeIngresoView extends VerticalLayout {
                     ex.printStackTrace();
                     Notification.show("Error al generar el reporte");
                 }
+
             });
+            verBtn.getElement().setAttribute("title", "Ver");
 
-            return btnVer;
-        }).setHeader("Ver");
+            // Botón Detalle
+            Button detalleBtn = new Button(VaadinIcon.INFO_CIRCLE.create(), click -> {
 
-        grid.addComponentColumn(recibo -> {
+                // Aquí puedes abrir un diálogo de detalle
+                try {
 
-            Button btnAnular = new Button(VaadinIcon.CLOSE.create(), event -> {
+                    UI.getCurrent().navigate("detalleRecibo/" + recibo.getCodigo());
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    //                    Notification.show("Error anulando el prestamo", 3000, Notification.Position.TOP_CENTER);
+                }
+            });
+            detalleBtn.getElement().setAttribute("title", "Detalle");
+
+            // Botón Anular
+            Button anularBtn = new Button(VaadinIcon.CLOSE_CIRCLE.create(), click -> {
 
                 try {
 
@@ -209,11 +227,18 @@ public class ReciboDeIngresoView extends VerticalLayout {
                     ex.printStackTrace();
                     Notification.show("Error al generar el reporte");
                 }
+
             });
 
-            return btnAnular;
-        }).setHeader("Anular");
+            anularBtn.getElement().setAttribute("title", "Anular");
+            anularBtn.getStyle().set("color", "red");
 
+            acciones.add(verBtn, detalleBtn, anularBtn);
+            return acciones;
+        }).setHeader("Acciones").setAutoWidth(true);
+
+        
+        
         grid.asSingleSelect().addValueChangeListener(event -> {
             reciboActual = event.getValue();
             if (reciboActual != null) {
@@ -228,44 +253,45 @@ public class ReciboDeIngresoView extends VerticalLayout {
             }
         });
     }
-
-    private FormLayout crearFormulario() {
-
-        FormLayout form = new FormLayout();
-        btnGuardar.setEnabled(false);
-        dpFecha.setValue(LocalDate.now());
-        numeroPrestamo.setEnabled(false);
-        nombreCliente.setEnabled(false);
-        txtValorCuota.setWidth("30%");
-        montoPendiente.setWidth("30%");
-        montoPrestado.setWidth("30%");
-
-        HorizontalLayout botones = new HorizontalLayout(btnGuardar, limpiar);
-        HorizontalLayout hlcliente = new HorizontalLayout(numeroPrestamo, buscarPrestamo);
-//        HorizontalLayout hlPrestamo = new HorizontalLayout(montoPrestado,txtValorCuota, montoPendiente);
-
-        hlcliente.setAlignItems(Alignment.BASELINE);
-        hlcliente.setSpacing(false);
 //
-//        hlPrestamo.setAlignItems(Alignment.BASELINE);
-//        hlPrestamo.setSpacing(true);
-//        hlPrestamo.setSizeFull();
+//    private FormLayout crearFormulario() {
+//
+//        FormLayout form = new FormLayout();
+//        btnGuardar.setEnabled(false);
+//        dpFecha.setValue(LocalDate.now());
+//        numeroPrestamo.setEnabled(false);
+//        nombreCliente.setEnabled(false);
+//        txtValorCuota.setWidth("30%");
+//        montoPendiente.setWidth("30%");
+//        montoPrestado.setWidth("30%");
+//
+//        HorizontalLayout botones = new HorizontalLayout(btnGuardar, limpiar);
+//        HorizontalLayout hlcliente = new HorizontalLayout(numeroPrestamo, buscarPrestamo);
 
-        btnGuardar.addClickListener(e -> guardar());
-
-        limpiar.addClickListener(e -> limpiarFormulario());
-
-        binder.bindInstanceFields(this);
-
-        form.add(dpFecha,
-                hlcliente,
-                nombreCliente,
-                txtValorCuota,
-                descripcionPago,
-                botones
-        );
-        return form;
-    }
+    ////        HorizontalLayout hlPrestamo = new HorizontalLayout(montoPrestado,txtValorCuota, montoPendiente);
+//
+//        hlcliente.setAlignItems(Alignment.BASELINE);
+//        hlcliente.setSpacing(false);
+////
+////        hlPrestamo.setAlignItems(Alignment.BASELINE);
+////        hlPrestamo.setSpacing(true);
+////        hlPrestamo.setSizeFull();
+//
+//        btnGuardar.addClickListener(e -> guardar());
+//
+//        limpiar.addClickListener(e -> limpiarFormulario());
+//
+//        binder.bindInstanceFields(this);
+//
+//        form.add(dpFecha,
+//                hlcliente,
+//                nombreCliente,
+//                txtValorCuota,
+//                descripcionPago,
+//                botones
+//        );
+//        return form;
+//    }
 
     private void guardar() {
 
