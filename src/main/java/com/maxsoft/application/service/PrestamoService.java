@@ -28,5 +28,8 @@ public interface PrestamoService {
 
     List<DetallePrestamo> getDetallePrestamo(int codPrestamo);
 
-    List<DetallePrestamo> getDetallePrestamo(int codPrestamo, boolean estado);
+    List<DetallePrestamo> getDetalleCuotaPendiente(int codPrestamo);
+    
+    Double getMontoPendienteCuota(int codPrestamo,int codCuota);
+    Double getMontoPagadoCuota(int codPrestamo,int codCuota);
 }

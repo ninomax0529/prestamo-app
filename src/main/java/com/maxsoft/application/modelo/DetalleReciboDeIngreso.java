@@ -37,10 +37,10 @@ public class DetalleReciboDeIngreso implements Serializable {
     @Basic(optional = false)
     @Column(name = "codigo")
     private Integer codigo;
-    @Basic(optional = false)
-    @NotNull
+    @Column(name = "cuota")
+    private Integer cuota;
     @Column(name = "numero_cuota")
-    private int numeroCuota;
+    private Integer numeroCuota;
     @Basic(optional = false)
     @NotNull
     @Column(name = "total")
@@ -65,9 +65,8 @@ public class DetalleReciboDeIngreso implements Serializable {
         this.codigo = codigo;
     }
 
-    public DetalleReciboDeIngreso(Integer codigo, int numeroCuota, double total, double montoPendiente, String concepto) {
+    public DetalleReciboDeIngreso(Integer codigo, double total, double montoPendiente, String concepto) {
         this.codigo = codigo;
-        this.numeroCuota = numeroCuota;
         this.total = total;
         this.montoPendiente = montoPendiente;
         this.concepto = concepto;
@@ -81,11 +80,19 @@ public class DetalleReciboDeIngreso implements Serializable {
         this.codigo = codigo;
     }
 
-    public int getNumeroCuota() {
+    public Integer getCuota() {
+        return cuota;
+    }
+
+    public void setCuota(Integer cuota) {
+        this.cuota = cuota;
+    }
+
+    public Integer getNumeroCuota() {
         return numeroCuota;
     }
 
-    public void setNumeroCuota(int numeroCuota) {
+    public void setNumeroCuota(Integer numeroCuota) {
         this.numeroCuota = numeroCuota;
     }
 

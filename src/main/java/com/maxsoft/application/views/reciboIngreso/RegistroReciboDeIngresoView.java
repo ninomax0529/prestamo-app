@@ -21,6 +21,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -73,7 +74,7 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
     Button buscarPrestamo = new Button(new Icon(VaadinIcon.SEARCH));
     ToolBarBotonera botonera = new ToolBarBotonera(false, true, true);
     private final Grid<DetallePrestamo> gridDetPrestamo = new Grid<>(DetallePrestamo.class, false);
-       ListDataProvider<DetallePrestamo> dataProvider ;
+    ListDataProvider<DetallePrestamo> dataProvider;
 
     private ReciboDeIngreso reciboActual;
     Cliente cliente;
@@ -113,17 +114,31 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
     private void configurarGridDetPrestamo() {
 
+// Editor
+        Binder biderDet = new Binder<>(DetallePrestamo.class);
+        Editor<DetallePrestamo> editor = gridDetPrestamo.getEditor();
+        editor.setBinder(biderDet);
+//        editor.setBuffered(true);
+
+        NumberField pendiente = new NumberField();
+        pendiente.setStep(0.01);
+        pendiente.setWidth("100px");
+
         gridDetPrestamo.addColumn(DetallePrestamo::getFecha).setHeader("Fecha").setWidth("120px");
         gridDetPrestamo.addColumn(DetallePrestamo::getNumeroCuota).setHeader("Numero").setWidth("88px");
         gridDetPrestamo.addColumn(DetallePrestamo::getValorCuota).setHeader("Cuota").setWidth("95px");
         gridDetPrestamo.addColumn(DetallePrestamo::getMontoPagado).setHeader("Pagado");
-        gridDetPrestamo.addColumn(DetallePrestamo::getMontoPendiente).setHeader("Pendiente");
-//
-//        gridDetPrestamo.addComponentColumn(p -> {
-//            Icon icon = p.getEstado() ? VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create();
-//            icon.setColor(p.getEstado() ? "green" : "red");
-//            return icon;
-//        }).setHeader("Saldada").setAutoWidth(true);
+        gridDetPrestamo.addColumn(DetallePrestamo::getMontoPendiente)
+                .setEditorComponent(pendiente)
+                .setHeader("Pendiente");
+
+        gridDetPrestamo.addItemClickListener(event -> {
+//            if (editor.isOpen()) {
+//                editor.cancel(); // cierra el editor actual
+//            }
+            editor.editItem(event.getItem());
+            pendiente.focus();
+        });
 
         gridDetPrestamo.addComponentColumn(p -> {
 
@@ -131,16 +146,27 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             checkbox.addValueChangeListener(event -> {
 
+                if (editor.isOpen()) {
+                    editor.cancel(); // cierra el editor actual
+                }
                 boolean nuevoEstado = event.getValue();
+
                 p.setEstado(nuevoEstado);
 
                 crearDetalle();
-               
             });
 
 //            checkbox.setReadOnly(true);
             return checkbox;
         }).setHeader("Pagar");
+
+        // Detectar ENTER
+        pendiente.getElement().addEventListener("keydown", e -> {
+
+            editor.getItem().setMontoPendiente(pendiente.getValue());
+
+//            editor.save(); // guarda el registro actual
+        }).setFilter("event.key === 'Enter'");
 
         gridDetPrestamo.setSizeFull();
 
@@ -167,7 +193,11 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         hlcliente.setAlignItems(Alignment.BASELINE);
         hlcliente.setSpacing("1%");
 
-        btnGuardar.addClickListener(e -> guardar());
+        btnGuardar.addClickListener(e -> {
+
+            guardar();
+
+        });
 
         limpiar.addClickListener(e -> limpiarFormulario());
 
@@ -193,13 +223,16 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             binder.writeBean(reciboActual);
             reciboActual.setFechaCreacion(new Date());
+            reciboActual.setCreadoPor("ADMIN");
             reciboActual.setFecha(ClaseUtil.asDate(dpFecha.getValue()));
             reciboActual.setCliente(cliente);
             reciboActual.setPrestamo(prestamo);
             reciboActual.setTotal(txtValorCuota.getValue());
 
             montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
-            montoPend = montoPend - reciboActual.getTotal();
+            System.out.println("montoPend actual "+montoPend);
+              montoPend = montoPend - reciboActual.getTotal();
+                 System.out.println("montoPend posterior menos  "+ reciboActual.getTotal()+" = "+montoPend);
 
             reciboActual.setMontoPendiente(montoPend);
             reciboActual.setDetalleReciboDeIngresoCollection(crearDetalle());
@@ -209,11 +242,17 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
             montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
             prestamo.setTotalPagado(montoPagado);
             prestamo.setTotalPendiente(montoPend);
+
+            actualizarDetallePresramo();
+
             prestamo.setDetallePrestamoCollection(dataProvider.getItems());
 
             prestamoService.guardar(prestamo);
 
             limpiarFormulario();
+            dataProvider.getItems().clear();
+            dataProvider.refreshAll();
+            Notification.show("Recibo guardado exitosamente ", 2000, Notification.Position.TOP_CENTER);
         } catch (ValidationException e) {
             e.printStackTrace();
         }
@@ -267,7 +306,7 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 //            descripcion.append("Pago ").append(canPago)
 //                    .append(" de ").append(prestamo.getCantidadPeriodo());
 
-            gridDetPrestamo.setItems(prestamoService.getDetallePrestamo(prestamo.getCodigo(),false));
+            gridDetPrestamo.setItems(prestamoService.getDetalleCuotaPendiente(prestamo.getCodigo()));
 
 //            descripcionPago.setValue(descripcion.toString());
         });
@@ -280,31 +319,52 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         List<DetalleReciboDeIngreso> lista = new ArrayList<>();
 
         DetalleReciboDeIngreso det;
-        
 
-       dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
+        dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
 
         String descPago = "";
-        for (DetallePrestamo p : dataProvider.getItems()) {
+        Double monPendiente, montoPagado=0.00;
 
-            if (p.getEstado() == true) {
+        reciboActual.setTotal(0.00);
+        for (DetallePrestamo detP : dataProvider.getItems()) {
+
+            if (detP.getEstado() == true) {
 
                 det = new DetalleReciboDeIngreso();
-                det.setTotal(p.getValorCuota());
-                det.setMontoPendiente(0);
+
+                monPendiente = prestamoService.getMontoPendienteCuota(detP.getPrestamo().getCodigo(), detP.getCodigo());
+//                montoPagado = prestamoService.getMontoPagadoCuota(detP.getPrestamo().getCodigo(), detP.getCodigo());
+
+                det.setTotal(detP.getMontoPendiente());
+                det.setMontoPendiente(monPendiente - det.getTotal());
                 det.setRecibo(reciboActual);
-                det.setNumeroCuota(p.getNumeroCuota());
+                det.setNumeroCuota(detP.getNumeroCuota());
+                det.setCuota(detP.getCodigo());
+                
+                montoPagado+=det.getTotal();
+                
+//                reciboActual.setTotal(reciboActual.getTotal()+det.getTotal());
+
                 StringBuilder builderDescripcion = new StringBuilder();
 
-                int canPago = p.getNumeroCuota();//this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
+                int canPago = detP.getNumeroCuota();//this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
 
-                builderDescripcion.append("Pago cuota ").append(canPago)
-                        .append(" de ").append(prestamo.getCantidadPeriodo());
+                if (det.getTotal() < detP.getValorCuota()) {
+
+                    builderDescripcion.append("Abono a cuota numero ").append(canPago);
+                    // .append(" de ").append(prestamo.getCantidadPeriodo());
+
+                } else {
+
+                    builderDescripcion.append("Pago cuota ").append(canPago)
+                            .append(" de ").append(prestamo.getCantidadPeriodo());
+
+                }
 
                 det.setConcepto(builderDescripcion.toString());
 
                 System.out.println("Concepto " + det.getConcepto());
-                descPago+=det.getConcepto()+"\n";
+                descPago += det.getConcepto() + "\n";
 
                 lista.add(det);
 
@@ -312,8 +372,28 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             descripcionPago.setValue(descPago);
         }
+        
+        txtValorCuota.setValue(montoPagado);
 
         return lista;
+    }
+
+    private void actualizarDetallePresramo() {
+
+        dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
+
+        Double monPendiente, montoPagado;
+
+        for (DetallePrestamo detP : dataProvider.getItems()) {
+
+            monPendiente = prestamoService.getMontoPendienteCuota(detP.getPrestamo().getCodigo(), detP.getCodigo());
+            montoPagado = prestamoService.getMontoPagadoCuota(detP.getPrestamo().getCodigo(), detP.getCodigo());
+
+            detP.setMontoPagado(montoPagado);
+            detP.setMontoPendiente(monPendiente);
+
+        }
+
     }
 
 }

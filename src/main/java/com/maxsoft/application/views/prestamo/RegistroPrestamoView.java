@@ -346,7 +346,7 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
             prestamo.setCreadoPor("ADMIN");
             prestamo.setFechaCreacion(new Date());         
-            prestamo.setTotalPendiente(prestamo.getMontoPrestado());
+            prestamo.setTotalPendiente(prestamo.getTotal());
             binder.writeBean(prestamo);
 
             prestamoService.guardar(prestamo);

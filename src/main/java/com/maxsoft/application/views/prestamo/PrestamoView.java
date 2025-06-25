@@ -21,6 +21,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Menu;
@@ -93,7 +94,7 @@ public class PrestamoView extends VerticalLayout {
     private void configurarGrid() {
 
         grid.addColumn(p -> p.getCodigo()).setHeader("Prestamo").setAutoWidth(true);
-        grid.addColumn(p -> p.getCliente() != null ? p.getCliente().getNombre() : "").setHeader("Cliente").setAutoWidth(true);
+        grid.addColumn(p -> p.getCliente().getNombre()).setHeader("Cliente").setAutoWidth(true);
         grid.addColumn(Prestamo::getNombreTipoPrestamo).setHeader("Tipo Prestamo").setAutoWidth(true);
         grid.addColumn(Prestamo::getMontoPrestado).setHeader("Monto Prestado").setAutoWidth(true);
         grid.addColumn(Prestamo::getMontoIntere).setHeader("Monto Interes").setAutoWidth(true);
@@ -102,9 +103,9 @@ public class PrestamoView extends VerticalLayout {
         grid.addColumn(Prestamo::getTotalPendiente).setHeader("Total Pendiente").setAutoWidth(true);
         grid.addColumn(Prestamo::getMontoCuota).setHeader("Valor Cuota").setAutoWidth(true);
         grid.addColumn(Prestamo::getFechaInicio).setHeader("Fecha Inicio").setAutoWidth(true);
-        grid.addColumn(Prestamo::getFechaPrimerPago).setHeader("Fecha Primer Pago").setAutoWidth(true);
+        grid.addColumn(Prestamo::getFechaPrimerPago).setHeader("Fecha Pago").setAutoWidth(true);
         grid.addColumn(Prestamo::getNombrePeriodo).setHeader("Periodo").setAutoWidth(true);
-        grid.addColumn(Prestamo::getCantidadPeriodo).setHeader("Cantidad Periodo").setAutoWidth(true);
+        grid.addColumn(Prestamo::getCantidadPeriodo).setHeader("Cant.Periodo").setAutoWidth(true);
 
         grid.setItems(prestamoService.getLista());
 //        grid.setSizeFull();
@@ -132,6 +133,22 @@ public class PrestamoView extends VerticalLayout {
         });
 
         grid.addComponentColumn(prest -> {
+
+            HorizontalLayout acciones = new HorizontalLayout();
+
+            Button verBtn = new Button(VaadinIcon.EYE.create(), event -> {
+
+                try {
+
+                    UI.getCurrent().navigate("detallePrestamo/" + prest.getCodigo());
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Notification.show("Error anulando el prestamo", 3000, Notification.Position.TOP_CENTER);
+                }
+            });
+
+            verBtn.getElement().setAttribute("title", "Ver");
 
             Button btnAnular = new Button(VaadinIcon.CLOSE.create(), event -> {
 
@@ -178,25 +195,15 @@ public class PrestamoView extends VerticalLayout {
                 }
             });
 
-            return btnAnular;
-        }).setHeader("Anular");
+            btnAnular.getElement().setAttribute("title", "Anular");
+            btnAnular.getStyle().set("color", "red");
+            acciones.setSizeFull();
+            acciones.setSpacing("2px");
 
-        grid.addComponentColumn(prest -> {
+            acciones.add(verBtn, btnAnular);
 
-            Button ver = new Button( VaadinIcon.EYE.create(), event -> {
-
-                try {
-
-                    UI.getCurrent().navigate("detallePrestamo/" + prest.getCodigo());
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    Notification.show("Error anulando el prestamo", 3000, Notification.Position.TOP_CENTER);
-                }
-            });
-
-            return ver;
-        }).setHeader("Detalle");
+            return acciones;
+        }).setHeader("Acciones");
 
     }
 
@@ -205,7 +212,7 @@ public class PrestamoView extends VerticalLayout {
     }
 
     private void limpiarFormulario() {
-        
+
         btnGuardar.setEnabled(false);
         prestamo = new Prestamo();
         binder.readBean(prestamo);

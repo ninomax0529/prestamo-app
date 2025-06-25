@@ -43,21 +43,21 @@ public class PrestamoServiceImpl implements PrestamoService {
     public Double getMontoPendiente(int codPrestamo) {
 
         Double monto = repo.getMontoPendiente(codPrestamo);
-        return monto==null ? 0.00 : monto;
+        return monto == null ? 0.00 : monto;
     }
 
     @Override
     public Double getMontoPagado(int codPrestamo) {
 
         Double monto = repo.getMontoPagado(codPrestamo);
-        return monto==null ? 0.00 : monto;
+        return monto == null ? 0.00 : monto;
     }
 
     @Override
     public Double getPrestamoPendiente(int codCliente) {
 
         Double monto = repo.getPrestamoPendiente(codCliente);
-        return monto==null ? 0.00 : monto;
+        return monto == null ? 0.00 : monto;
     }
 
     @Override
@@ -69,13 +69,27 @@ public class PrestamoServiceImpl implements PrestamoService {
     }
 
     @Override
-    public List<DetallePrestamo> getDetallePrestamo(int codPrestamo, boolean estado) {
+    public List<DetallePrestamo> getDetalleCuotaPendiente(int codPrestamo) {
 
-        List<DetallePrestamo> lista = repo.getDetallePrestamo(codPrestamo,estado);
-        
-        System.out.println("cant "+lista.size());
+        List<DetallePrestamo> lista = repo.getDetalleCuotaPendiente(codPrestamo);
+
+        System.out.println("cant " + lista.size());
 
         return lista;
+    }
+
+    @Override
+    public Double getMontoPendienteCuota(int codPrestamo, int codCuota) {
+
+        Double monto = repo.getMontoPendienteCuota(codPrestamo, codCuota);
+        return monto == null ? 0.00 : monto;
+    }
+
+    @Override
+    public Double getMontoPagadoCuota(int codPrestamo, int codCuota) {
+
+        Double monto = repo.getMontoPagadoCuota(codPrestamo, codCuota);
+        return monto == null ? 0.00 : monto;
     }
 
 }
