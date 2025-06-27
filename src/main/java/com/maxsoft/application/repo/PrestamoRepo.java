@@ -99,4 +99,14 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
     @Query(value = strAbonado, nativeQuery = true)
     public Double getMontoPagado(@Param("codPrestamo") int codPrestamo);
 
+    String strPrestamo = """
+                               
+                       select *
+                       from  prestamo  p
+                       where codigo=:codPrestamo 
+                         """;
+
+    @Query(value = strPrestamo, nativeQuery = true)
+    public Prestamo getPrestamo(@Param("codPrestamo") int codPrestamo);
+
 }

@@ -37,6 +37,7 @@ public class ClienteView extends VerticalLayout {
     @Autowired
     public ClienteView(ClienteService clienteService) {
         this.clienteService = clienteService;
+        setSizeFull();
      
 //        add(new H3("Gestión de Clientes"));
 

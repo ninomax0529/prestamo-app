@@ -102,7 +102,6 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 //                            , 3000, Notification.Position.TOP_CENTER);
 //                 return;
 //             }
-           
             ConfirmDialog dialog = new ConfirmDialog(
                     "¿Estás seguro que quiere guardar el prestamo -> ",
                     () -> {
@@ -194,9 +193,9 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
                 hlCliente,
                 tipoPrestamo,
                 hlPeriodo,
+                hlFecha,
                 hlMonto,
-                hlValor,
-                hlFecha
+                hlValor
         );
 
         return formLayout;
@@ -345,14 +344,14 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             prestamo.setNombrePeriodo(periodo.getValue().getNombre());
             prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
             prestamo.setCreadoPor("ADMIN");
-            prestamo.setFechaCreacion(new Date());         
+            prestamo.setFechaCreacion(new Date());
             prestamo.setTotalPendiente(prestamo.getTotal());
             binder.writeBean(prestamo);
 
             prestamoService.guardar(prestamo);
 
             actualizarGrid();
-         
+
             limpiarFormulario();
         } catch (ValidationException ex) {
             Notification.show("Datos inválidos: " + ex.getMessage());

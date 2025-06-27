@@ -8,6 +8,7 @@ import com.maxsoft.application.modelo.Cliente;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -25,58 +26,61 @@ public class ClienteSelectorDialog extends Dialog {
     private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
     private final TextField filtroNombre = new TextField("Buscar por nombre");
     private final TextField filtroCedula = new TextField("Buscar por cédula");
-    private final Button seleccionarButton = new Button("Seleccionar");
+    private Button seleccionarButton;
     private Cliente clienteSeleccionado;
+    Consumer<Cliente> onClienteSeleccionado;
 
     private final List<Cliente> clientes;
 
     public ClienteSelectorDialog(List<Cliente> clientes, Consumer<Cliente> onClienteSeleccionado) {
         this.clientes = clientes;
+        this.onClienteSeleccionado = onClienteSeleccionado;
 
         setSizeFull();
         setHeaderTitle("Seleccionar Cliente");
         setModal(true);
         setCloseOnEsc(true);
         setCloseOnOutsideClick(true);
-       filtroNombre.focus();
+
+        filtroNombre.focus();
 
         configurarGrid();
         configurarFiltros();
 
-        seleccionarButton.setEnabled(false);
-        seleccionarButton.addClickListener(e -> {
-            if (clienteSeleccionado != null) {
-                onClienteSeleccionado.accept(clienteSeleccionado);
-                close();
-            }
-        });
-
         Button cancelar = new Button("Cancelar", e -> close());
 
-        HorizontalLayout filtros = new HorizontalLayout(filtroNombre, filtroCedula);
+        HorizontalLayout filtros = new HorizontalLayout(filtroNombre);
         filtros.setWidthFull();
 
-        HorizontalLayout botones = new HorizontalLayout(seleccionarButton, cancelar);
-
-        add(new VerticalLayout(filtros, grid, botones));
+//        HorizontalLayout botones = new HorizontalLayout(seleccionarButton, cancelar);
+        add(new VerticalLayout(cancelar, filtros, grid));
     }
 
     private void configurarGrid() {
-        
+
+        grid.addComponentColumn(cliente -> {
+
+            seleccionarButton = new Button(VaadinIcon.CHECK.create(), e -> {
+
+                if (cliente != null) {
+                    onClienteSeleccionado.accept(cliente);
+                    close();
+                }
+            });
+
+            return seleccionarButton;
+        }).setHeader("Selccionar");
         grid.addColumn(Cliente::getCodigo).setHeader("Código").setAutoWidth(true);
         grid.addColumn(Cliente::getNombre).setHeader("Nombre").setAutoWidth(true);
         grid.addColumn(Cliente::getCedula).setHeader("Cédula").setAutoWidth(true);
         grid.setItems(clientes);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
-        grid.addSelectionListener(event -> {
-            clienteSeleccionado = event.getFirstSelectedItem().orElse(null);
-            seleccionarButton.setEnabled(clienteSeleccionado != null);
-        });
+//        
     }
 
     private void configurarFiltros() {
-        
+
         filtroNombre.setPlaceholder("Ej: Juan");
         filtroNombre.setClearButtonVisible(true);
         filtroNombre.setValueChangeMode(ValueChangeMode.EAGER); // 👈 Aquí está la clave

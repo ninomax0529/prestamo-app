@@ -16,6 +16,8 @@ public interface PrestamoService {
 
     Prestamo guardar(Prestamo obj);
 
+    Prestamo getPrestamo(int obj);
+
     List<Prestamo> getLista();
 
     List<Prestamo> getPrestamoPendiente();
@@ -29,7 +31,8 @@ public interface PrestamoService {
     List<DetallePrestamo> getDetallePrestamo(int codPrestamo);
 
     List<DetallePrestamo> getDetalleCuotaPendiente(int codPrestamo);
-    
-    Double getMontoPendienteCuota(int codPrestamo,int codCuota);
-    Double getMontoPagadoCuota(int codPrestamo,int codCuota);
+
+    Double getMontoPendienteCuota(int codPrestamo, int codCuota);
+
+    Double getMontoPagadoCuota(int codPrestamo, int codCuota);
 }

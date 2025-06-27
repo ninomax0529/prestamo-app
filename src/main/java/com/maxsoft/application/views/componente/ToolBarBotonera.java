@@ -21,6 +21,7 @@ public class ToolBarBotonera extends HorizontalLayout {
 
     public ToolBarBotonera(boolean bn, boolean bg, boolean bc) {
         addClassName("buttons-toolbar");
+        setMaxHeight("20px");
         setWidthFull();
         setSpacing(true);
         setPadding(false);

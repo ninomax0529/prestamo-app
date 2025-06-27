@@ -18,10 +18,12 @@ public interface ReciboDeIngresoService {
 
     List<ReciboDeIngreso> getLista();
 
-    public List<ReciboDeIngreso> getLista(boolean estado);
+    List<ReciboDeIngreso> getLista(boolean estado);
 
-    public Integer getCantidadPago(int op);
-    
-        List<DetalleReciboDeIngreso> getDetalleRecibo(int codRecibo);
+    Integer getCantidadPago(int op);
+
+    List<DetalleReciboDeIngreso> getDetalleRecibo(int codRecibo);
+
+    ReciboDeIngreso getReciboDeIngreso(int codRecibo);
 
 }

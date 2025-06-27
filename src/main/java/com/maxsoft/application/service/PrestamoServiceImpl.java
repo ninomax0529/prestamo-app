@@ -92,4 +92,12 @@ public class PrestamoServiceImpl implements PrestamoService {
         return monto == null ? 0.00 : monto;
     }
 
+    @Override
+    public Prestamo getPrestamo(int obj) {
+       
+        Prestamo p=repo.getPrestamo(obj);
+        System.out.println("P : "+p);
+        return p;
+    }
+
 }

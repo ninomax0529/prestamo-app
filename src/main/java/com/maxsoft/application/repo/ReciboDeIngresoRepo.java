@@ -43,5 +43,15 @@ public interface ReciboDeIngresoRepo extends JpaRepository<ReciboDeIngreso, Inte
 
     @Query(value = strDetRecibo, nativeQuery = true)
     List<DetalleReciboDeIngreso> getDetalleRecibo(@Param("codRecibo") int codRecibo);
+    
+        String strRecibo = """
+                               
+                       select *
+                       from  recibo_de_ingreso  r
+                       where codigo=:codRecibo 
+                         """;
+
+    @Query(value = strRecibo, nativeQuery = true)
+    public ReciboDeIngreso getReciboDeIngreso(@Param("codRecibo") int codRecibo);
 
 }

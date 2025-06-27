@@ -4,7 +4,6 @@
  */
 package com.maxsoft.application.views.reciboIngreso;
 
-import com.helger.css.ECSSUnit;
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
@@ -19,7 +18,6 @@ import com.maxsoft.application.views.dialogo.PrestamoDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
@@ -43,7 +41,6 @@ import java.util.List;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import java.sql.Connection;
-import java.time.LocalDate;
 import javax.sql.DataSource;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
@@ -132,13 +129,14 @@ public class ReciboDeIngresoView extends VerticalLayout {
         grid.addColumn(r -> r.getCodigo()).setHeader("Recibo").setAutoWidth(true);
         grid.addColumn(r -> r.getPrestamo() != null ? r.getPrestamo().getCodigo() : "").setHeader("Préstamo");
         grid.addColumn(r -> r.getFecha()).setHeader("Fecha").setAutoWidth(true);
-        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente").setAutoWidth(true);
-        grid.addColumn(r -> r.getTotal()).setHeader("Total").setAutoWidth(true);
+//        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente").setAutoWidth(true);
+//        grid.addColumn(r -> r.getTotal()).setHeader("Total").setAutoWidth(true);
 //        grid.addColumn(r -> r.getMontoPendiente()).setHeader("Pendiente");
-        grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago").setAutoWidth(true);
+//        grid.addColumn(r -> r.getDescripcionPago()).setHeader("Descripcion Pago").setAutoWidth(true);
 
         grid.addComponentColumn(recibo -> {
             HorizontalLayout acciones = new HorizontalLayout();
+            acciones.setSpacing("2px");
 
             // Botón Ver
             Button verBtn = new Button(VaadinIcon.EYE.create(), click -> {
@@ -167,6 +165,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
                 }
 
             });
+            
             verBtn.getElement().setAttribute("title", "Ver");
 
             // Botón Detalle

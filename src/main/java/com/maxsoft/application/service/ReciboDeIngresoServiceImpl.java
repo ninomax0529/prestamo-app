@@ -50,10 +50,17 @@ public class ReciboDeIngresoServiceImpl implements ReciboDeIngresoService {
 
     @Override
     public List<DetalleReciboDeIngreso> getDetalleRecibo(int codRecibo) {
-       
+
         List<DetalleReciboDeIngreso> lista = repo.getDetalleRecibo(codRecibo);
 
         return lista;
+    }
+
+    @Override
+    public ReciboDeIngreso getReciboDeIngreso(int codRecibo) {
+
+        ReciboDeIngreso r = repo.getReciboDeIngreso(codRecibo);
+        return r;
     }
 
 }

@@ -15,8 +15,10 @@ import com.maxsoft.application.util.ClaseUtil;
 import com.maxsoft.application.util.NavigationContext;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -46,6 +48,7 @@ import java.util.List;
 import com.vaadin.flow.router.Route;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
@@ -64,7 +67,7 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
     private final TextField nombreCliente = new TextField("Nombre del Cliente");
     private final TextField numeroPrestamo = new TextField("Prestamo");
-    private final NumberField txtValorCuota = new NumberField("Valor Cuota");
+    private final NumberField txtValorCuota = new NumberField("Total a pagar");
     private final NumberField montoPendiente = new NumberField("Monto Pendiente");
     private final NumberField montoPrestado = new NumberField("Monto Prestado");
     private final TextArea descripcionPago = new TextArea("Descripción del Pago");
@@ -118,7 +121,8 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         Binder biderDet = new Binder<>(DetallePrestamo.class);
         Editor<DetallePrestamo> editor = gridDetPrestamo.getEditor();
         editor.setBinder(biderDet);
-//        editor.setBuffered(true);
+
+        editor.setBuffered(true);
 
         NumberField pendiente = new NumberField();
         pendiente.setStep(0.01);
@@ -133,26 +137,39 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
                 .setHeader("Pendiente");
 
         gridDetPrestamo.addItemClickListener(event -> {
-//            if (editor.isOpen()) {
-//                editor.cancel(); // cierra el editor actual
-//            }
-            editor.editItem(event.getItem());
-            pendiente.focus();
+
+            crearDetalle();
+            dataProvider.refreshAll();
         });
 
         gridDetPrestamo.addComponentColumn(p -> {
 
-            Checkbox checkbox = new Checkbox(false);
+            Checkbox checkbox = new Checkbox();
 
             checkbox.addValueChangeListener(event -> {
 
-                if (editor.isOpen()) {
-                    editor.cancel(); // cierra el editor actual
-                }
+//                Optional<DetallePrestamo> detAnt = gridDetPrestamo.getListDataView().getPreviousItem(editor.getItem());
+//                            
+//                if (editor.getItem().getEstado()==false &&  detAnt.get().getEstado()==true) {
+//
+//                    Notification.show("El acumulada actual no puede ser menor que el acumulado anterior ", 3000, Notification.Position.MIDDLE);
+//                    return;
+//                }
+
+//                if (editor.isOpen()) {
+//                    editor.cancel(); // cierra el editor actual
+//                }
+//                if (checkbox.getValue()) {
+//                    checkbox.setValue(Boolean.FALSE);
+//                } else {
+//                    checkbox.setValue(Boolean.TRUE);
+//                }
+//                editor.editItem(p);
+                //                pendiente.focus();
                 boolean nuevoEstado = event.getValue();
 
                 p.setEstado(nuevoEstado);
-
+//
                 crearDetalle();
             });
 
@@ -168,7 +185,65 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 //            editor.save(); // guarda el registro actual
         }).setFilter("event.key === 'Enter'");
 
-        gridDetPrestamo.setSizeFull();
+        Grid.Column<DetallePrestamo> editColumn = gridDetPrestamo.addComponentColumn(det -> {
+
+            Button editButton = new Button("Editar");
+
+            editButton.addClickListener(e -> {
+
+                if (editor.isOpen()) {
+                    editor.cancel();
+                }
+                System.out.println("det : " + det);
+
+                editor.editItem(det);
+//                editor.getItem().setEstado(true);
+                det.setEstado(true);
+
+            }
+            );
+
+            pendiente.setValue(det.getMontoPendiente());
+            pendiente.focus();
+
+            return editButton;
+        }).setHeader("Accion").setWidth("100px").setFlexGrow(1).setKey("editar");
+//
+//        Button btnAplicar = new Button("Aplicar");
+        Button btnAplicar = new Button("Aplicar", e -> {
+
+            editor.getItem().setMontoPendiente(pendiente.getValue());
+            crearDetalle();
+            dataProvider.refreshAll();
+        });
+
+//        btnAplicar.addClickListener(e -> {
+//            crearDetalle();
+//            dataProvider.refreshAll();
+//        });
+        btnAplicar.addClickShortcut(Key.ENTER);
+
+        Button btnCancelar = new Button(VaadinIcon.CLOSE.create(),
+                e -> {
+
+                    editor.getItem().setEstado(false);
+                    editor.cancel();
+                    dataProvider.refreshAll();
+
+                });
+
+        btnCancelar.addThemeVariants(ButtonVariant.LUMO_ICON,
+                ButtonVariant.LUMO_WARNING);
+
+        HorizontalLayout actions = new HorizontalLayout(btnAplicar,
+                btnCancelar);
+        actions.setWidth("90px");
+
+        actions.setPadding(true);
+
+        editColumn.setEditorComponent(actions);
+
+//        gridDetPrestamo.setSizeFull();
 
     }
 
@@ -230,9 +305,9 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
             reciboActual.setTotal(txtValorCuota.getValue());
 
             montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
-            System.out.println("montoPend actual "+montoPend);
-              montoPend = montoPend - reciboActual.getTotal();
-                 System.out.println("montoPend posterior menos  "+ reciboActual.getTotal()+" = "+montoPend);
+            System.out.println("montoPend actual " + montoPend);
+            montoPend = montoPend - reciboActual.getTotal();
+            System.out.println("montoPend posterior menos  " + reciboActual.getTotal() + " = " + montoPend);
 
             reciboActual.setMontoPendiente(montoPend);
             reciboActual.setDetalleReciboDeIngresoCollection(crearDetalle());
@@ -323,9 +398,8 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
 
         String descPago = "";
-        Double monPendiente, montoPagado=0.00;
+        Double monPendiente, montoPagado = 0.00;
 
-        reciboActual.setTotal(0.00);
         for (DetallePrestamo detP : dataProvider.getItems()) {
 
             if (detP.getEstado() == true) {
@@ -340,11 +414,10 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
                 det.setRecibo(reciboActual);
                 det.setNumeroCuota(detP.getNumeroCuota());
                 det.setCuota(detP.getCodigo());
-                
-                montoPagado+=det.getTotal();
-                
-//                reciboActual.setTotal(reciboActual.getTotal()+det.getTotal());
 
+                montoPagado += det.getTotal();
+
+//                reciboActual.setTotal(reciboActual.getTotal()+det.getTotal());
                 StringBuilder builderDescripcion = new StringBuilder();
 
                 int canPago = detP.getNumeroCuota();//this.reciboService.getCantidadPago(prestamo.getCodigo()) + 1;
@@ -372,7 +445,7 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             descripcionPago.setValue(descPago);
         }
-        
+
         txtValorCuota.setValue(montoPagado);
 
         return lista;

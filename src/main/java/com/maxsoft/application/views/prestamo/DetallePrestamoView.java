@@ -14,10 +14,15 @@ import com.maxsoft.application.util.NavigationContext;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
@@ -34,10 +39,21 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class DetallePrestamoView extends VerticalLayout implements HasUrlParameter<String> {
 
+    // Componentes del formulario
+    private final TextField txtFechaInicio = new TextField("Fecha");
+    private final TextField txtNombreCliente = new TextField("Cliente");
+    private final TextField txtTipoPrestamo = new TextField("Tipo Prestamo");
+    private final NumberField txtMontoPrestado = new NumberField("Monto Prestado");
+    private final NumberField txtTotalPrestamo = new NumberField("Total");
+    private final NumberField txtMontoIntere = new NumberField("Monto Interés");
+    private final NumberField txtTasaDeIntere = new NumberField("Tasa de Interés %");
+    TextField txtPeriodo = new TextField("Periodo");
+
     private final PrestamoService prestamoService;
     private final PeriodoService periodoService;
     private final TipoPrestamoService tipoPrestamoService;
     private final ClienteService clienteService;
+    Prestamo prestamo;
     ToolBarBotonera botonera = new ToolBarBotonera(false, false, true);
 
     private final Grid<DetallePrestamo> grid = new Grid<>(DetallePrestamo.class, false);
@@ -52,7 +68,7 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
         setSizeFull();
         setPadding(true);
-        setSpacing(true);
+        setSpacing("8px");
         this.prestamoService = prestamoService;
         this.periodoService = periodoService;
         this.tipoPrestamoService = tipoPrestamoService;
@@ -78,7 +94,7 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
         configurarGrid();
 
-        add(botonera, grid);
+        add(botonera, crearFormulario(), grid);
 
     }
 
@@ -97,6 +113,48 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
     }
 
+    private FormLayout crearFormulario() {
+
+//        totalPrestamo.setWidth("30%");
+//        montoCuota.setWidth("30%");
+//        tasaDeIntere.setWidth("30%");
+//        montoIntere.setWidth("35%");
+//        montoPrestado.setWidth("35%");
+        HorizontalLayout hlValor = new HorizontalLayout(txtTasaDeIntere, txtTotalPrestamo);
+        HorizontalLayout hlCliente = new HorizontalLayout(txtFechaInicio, txtNombreCliente);
+        HorizontalLayout hlPeriodo = new HorizontalLayout(txtTipoPrestamo, txtPeriodo);
+        HorizontalLayout hlMonto = new HorizontalLayout(txtMontoPrestado, txtMontoIntere);
+
+//        nombreCliente.setSizeFull();
+        txtNombreCliente.setReadOnly(true);
+        txtTotalPrestamo.setReadOnly(true);
+        txtFechaInicio.setReadOnly(true);
+        txtTasaDeIntere.setReadOnly(true);
+        txtTipoPrestamo.setReadOnly(true);
+        txtPeriodo.setReadOnly(true);
+        txtMontoPrestado.setReadOnly(true);
+        txtMontoIntere.setReadOnly(true);
+
+//        hlPeriodo.setSizeFull();
+        hlValor.setSpacing("1%");
+        hlCliente.setSpacing("1%");
+        hlMonto.setSpacing("1%");
+
+        hlValor.setAlignItems(Alignment.BASELINE);
+        hlCliente.setAlignItems(Alignment.BASELINE);
+        hlPeriodo.setAlignItems(Alignment.BASELINE);
+        hlMonto.setAlignItems(Alignment.BASELINE);
+
+        FormLayout formLayout = new FormLayout(
+                hlCliente,
+                hlPeriodo,
+                hlMonto,
+                hlValor
+        );
+
+        return formLayout;
+    }
+
     @Override
     public void setParameter(BeforeEvent be, String t) {
 
@@ -104,7 +162,25 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
         Integer codigo = Integer.valueOf(t);
 
+        prestamo = prestamoService.getPrestamo(codigo);
+
         grid.setItems(prestamoService.getDetallePrestamo(codigo));
+
+        if (prestamo != null) {
+
+            txtNombreCliente.setValue(prestamo.getNombreCliente());
+            txtPeriodo.setValue(prestamo.getNombrePeriodo());
+            txtMontoIntere.setValue(prestamo.getMontoIntere());
+            txtMontoPrestado.setValue(prestamo.getMontoPrestado());
+            txtTipoPrestamo.setValue(prestamo.getNombreTipoPrestamo());
+              txtTasaDeIntere.setValue(prestamo.getTasaDeIntere());
+            txtTotalPrestamo.setValue(prestamo.getTotal());
+
+            txtFechaInicio.setValue(prestamo.getFechaInicio().toString());
+
+        } else {
+            System.out.println("Prestamo null ");
+        }
     }
 
 }

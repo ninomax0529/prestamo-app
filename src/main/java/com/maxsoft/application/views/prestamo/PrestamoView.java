@@ -7,6 +7,7 @@ package com.maxsoft.application.views.prestamo;
 import com.maxsoft.application.modelo.Periodo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.TipoPrestamo;
+import com.maxsoft.application.reporte.RptPrestamo;
 import com.maxsoft.application.service.ClienteService;
 import com.maxsoft.application.service.PeriodoService;
 import com.maxsoft.application.service.PrestamoService;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,7 +29,11 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
+import java.sql.Connection;
 import java.util.Date;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 /**
@@ -39,6 +45,8 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class PrestamoView extends VerticalLayout {
 
+    @Autowired
+    DataSource dataSource;
     private final PrestamoService prestamoService;
     private final PeriodoService periodoService;
     private final TipoPrestamoService tipoPrestamoService;
@@ -95,20 +103,18 @@ public class PrestamoView extends VerticalLayout {
 
         grid.addColumn(p -> p.getCodigo()).setHeader("Prestamo").setAutoWidth(true);
         grid.addColumn(p -> p.getCliente().getNombre()).setHeader("Cliente").setAutoWidth(true);
-        grid.addColumn(Prestamo::getNombreTipoPrestamo).setHeader("Tipo Prestamo").setAutoWidth(true);
-        grid.addColumn(Prestamo::getMontoPrestado).setHeader("Monto Prestado").setAutoWidth(true);
-        grid.addColumn(Prestamo::getMontoIntere).setHeader("Monto Interes").setAutoWidth(true);
-        grid.addColumn(Prestamo::getTotal).setHeader("Total Prestamo").setAutoWidth(true);
-        grid.addColumn(Prestamo::getTotalPagado).setHeader("Total Pagado").setAutoWidth(true);
-        grid.addColumn(Prestamo::getTotalPendiente).setHeader("Total Pendiente").setAutoWidth(true);
-        grid.addColumn(Prestamo::getMontoCuota).setHeader("Valor Cuota").setAutoWidth(true);
-        grid.addColumn(Prestamo::getFechaInicio).setHeader("Fecha Inicio").setAutoWidth(true);
-        grid.addColumn(Prestamo::getFechaPrimerPago).setHeader("Fecha Pago").setAutoWidth(true);
-        grid.addColumn(Prestamo::getNombrePeriodo).setHeader("Periodo").setAutoWidth(true);
-        grid.addColumn(Prestamo::getCantidadPeriodo).setHeader("Cant.Periodo").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getNombreTipoPrestamo).setHeader("Tipo Prestamo").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getMontoPrestado).setHeader("Monto Prestado").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getMontoIntere).setHeader("Monto Interes").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getTotal).setHeader("Total Prestamo").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getTotalPagado).setHeader("Total Pagado").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getTotalPendiente).setHeader("Total Pendiente").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getFechaInicio).setHeader("Fecha Inicio").setAutoWidth(true); 
+//        grid.addColumn(Prestamo::getNombrePeriodo).setHeader("Periodo").setAutoWidth(true);
+//        grid.addColumn(Prestamo::getCantidadPeriodo).setHeader("Cant.Periodo").setAutoWidth(true);
 
         grid.setItems(prestamoService.getLista());
-//        grid.setSizeFull();
+        grid.setSizeFull();
 
         grid.asSingleSelect().addValueChangeListener(event -> {
 
@@ -138,6 +144,37 @@ public class PrestamoView extends VerticalLayout {
 
             Button verBtn = new Button(VaadinIcon.EYE.create(), event -> {
 
+                // Aquí puedes abrir un diálogo o navegar
+                try (Connection conn = dataSource.getConnection()) {
+
+                    RptPrestamo rptP = new RptPrestamo();
+
+                    if (rptP != null) {
+
+                        StreamResource pdfResource = rptP.reciboIngreso(prest.getCodigo(), conn);
+
+                        Anchor anchor = new Anchor(pdfResource, "");
+                        anchor.getElement().setAttribute("download", false);
+                        anchor.getElement().setAttribute("target", "_blank");
+
+                        anchor.getElement().callJsFunction("click"); // dispara la apertura automática
+
+                        add(anchor);
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Notification.show("Error al generar el reporte");
+                }
+
+            });
+
+            verBtn.getElement().setAttribute("title", "Ver");
+
+            // Botón Detalle
+            Button detalleBtn = new Button(VaadinIcon.INFO_CIRCLE.create(), click -> {
+
+                // Aquí puedes abrir un diálogo de detalle
                 try {
 
                     UI.getCurrent().navigate("detallePrestamo/" + prest.getCodigo());
@@ -147,8 +184,7 @@ public class PrestamoView extends VerticalLayout {
                     Notification.show("Error anulando el prestamo", 3000, Notification.Position.TOP_CENTER);
                 }
             });
-
-            verBtn.getElement().setAttribute("title", "Ver");
+            detalleBtn.getElement().setAttribute("title", "Detalle");
 
             Button btnAnular = new Button(VaadinIcon.CLOSE.create(), event -> {
 
@@ -197,13 +233,14 @@ public class PrestamoView extends VerticalLayout {
 
             btnAnular.getElement().setAttribute("title", "Anular");
             btnAnular.getStyle().set("color", "red");
+//            btnAnular.setWidth("80px");
             acciones.setSizeFull();
             acciones.setSpacing("2px");
 
-            acciones.add(verBtn, btnAnular);
+            acciones.add(verBtn, detalleBtn, btnAnular);
 
             return acciones;
-        }).setHeader("Acciones");
+        }).setHeader("Acciones").setAutoWidth(true);
 
     }
 
