@@ -7,6 +7,8 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -20,7 +22,6 @@ import java.util.List;
 /**
  * The main view is a top-level placeholder for other views.
  */
-
 @Layout
 @AnonymousAllowed
 
@@ -41,9 +42,26 @@ public class MainLayout extends AppLayout {
         viewTitle = new H1();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        addToNavbar(true, toggle, viewTitle);
+        HorizontalLayout header = new HorizontalLayout(toggle, viewTitle);
+        header.setWidthFull();
+        header.setAlignItems(FlexComponent.Alignment.CENTER);
+        header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        header.getStyle().set("padding", "var(--lumo-space-m)");
+
+        addToNavbar(true, header);
     }
 
+//
+//    private void addHeaderContent() {
+//        
+//        DrawerToggle toggle = new DrawerToggle();
+//        toggle.setAriaLabel("Menu toggle");
+//
+//        viewTitle = new H1();
+//        viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+//
+//        addToNavbar(true, toggle, viewTitle);
+//    }
     private void addDrawerContent() {
         Span appName = new Span("AppPrestamo");
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
