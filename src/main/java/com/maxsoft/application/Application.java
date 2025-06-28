@@ -15,8 +15,25 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-@PWA(name = "App de Prestamo", shortName = "AppPrestamo", offlineResources = {})
+//@PWA(name = "App de Prestamo", shortName = "AppPrestamo", offlineResources = {})
+// @PWA(
+//    name = "App de Prestamo",
+//    shortName = "AppPrestamo",
+//    offlinePath = "offline.html"
+//)
+@PWA(
+    name = "App de Prestamo",
+    shortName = "AppPrestamo",
+    description = "Gestión de préstamos para clientes",
+    startPath = "/",
+    backgroundColor = "#ffffff",
+    themeColor = "#0d47a1",
+    display = "standalone",
+    offlinePath = "offline.html"
+)
+
 @Theme(value = "prestamo-app")
+
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
