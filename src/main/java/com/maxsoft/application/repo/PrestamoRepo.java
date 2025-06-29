@@ -20,7 +20,7 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
     String strPrestamoPend = """
                        select  * from  prestamo  p
                        where anulado=false
-                       and  (monto_prestado-F_TOTAL_ABONO(p.codigo))>0 """;
+                       and  (total-F_TOTAL_ABONO(p.codigo))>0 """;
 
     @Query(value = strPrestamoPend, nativeQuery = true)
     public List<Prestamo> getPrestamoPendiente();

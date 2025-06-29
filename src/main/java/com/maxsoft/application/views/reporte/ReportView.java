@@ -49,9 +49,9 @@ public class ReportView extends VerticalLayout {
 
     public ReportView() {
 
-//        radioGroup.setLabel("Seleccione una Opcion :");
-        radioGroup.setItems(List.of("Pendiente", "Todos"));
-        radioGroup.setValue("Pendiente");
+        //        radioGroup.setLabel("Seleccione una Opcion :");
+        radioGroup.setItems(List.of("Todos", "Pendiente", "Saldado"));
+        radioGroup.setValue("Todos");
 //        radioGroup.setLabel("Empaque");// Mostrar solo el nombre
         datePicker.setValue(LocalDate.now());
 

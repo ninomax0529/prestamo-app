@@ -4,6 +4,7 @@
  */
 package com.maxsoft.application.views.prestamo;
 
+import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.Periodo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.TipoPrestamo;
@@ -13,18 +14,21 @@ import com.maxsoft.application.service.PeriodoService;
 import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.TipoPrestamoService;
 import com.maxsoft.application.util.NavigationContext;
+import com.maxsoft.application.views.componente.FiltroAvanzado;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.maxsoft.application.views.dialogo.ConfirmDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -32,6 +36,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import java.sql.Connection;
 import java.util.Date;
+import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
@@ -64,17 +69,33 @@ public class PrestamoView extends VerticalLayout {
     private final Button btnLimpiar = new Button("Limpiar", VaadinIcon.REFRESH.create());
     Button buscarClienteBtn = new Button(new Icon(VaadinIcon.SEARCH));
     private final Button btnCalcular = new Button("Calcular");
+      RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
 
     public PrestamoView(PrestamoService prestamoService, PeriodoService periodoService, TipoPrestamoService tipoPrestamoService,
             ClienteService clienteService) {
 
         setSizeFull();
         setPadding(true);
-        setSpacing(true);
+        setSpacing(false);
         this.prestamoService = prestamoService;
         this.periodoService = periodoService;
         this.tipoPrestamoService = tipoPrestamoService;
         this.clienteService = clienteService;
+        
+        //        radioGroup.setLabel("Seleccione una Opcion :");
+        radioGroup.setItems(List.of("Todos","Pendiente","Saldado"));
+        radioGroup.setValue("Todos");
+        
+         GridListDataView<Prestamo> dataView = grid.setItems(this.prestamoService.getLista());
+
+// Crear el filtro avanzado
+        FiltroAvanzado<Prestamo> filtro = new FiltroAvanzado<>(dataView);
+
+// Agregar filtros por nombre y cédula
+        filtro.addFiltro("Cliente", Prestamo::getNombreCliente);
+//        filtro.addFiltro("Prestamo", Prestamo::getCodigo().toStrin);
+
+        
         btnGuardar.setEnabled(false);
 
         botonera.getNuevo().addClickListener(e -> {
@@ -94,7 +115,7 @@ public class PrestamoView extends VerticalLayout {
         configurarGrid();
 //        configurarEventos();
 
-        add(botonera, grid);
+        add(botonera,radioGroup,filtro, grid);
         actualizarGrid();
 
     }

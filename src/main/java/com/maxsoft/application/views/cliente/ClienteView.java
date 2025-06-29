@@ -12,12 +12,13 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.service.ClienteService;
 import com.maxsoft.application.util.NavigationContext;
+import com.maxsoft.application.views.componente.FiltroAvanzado;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
@@ -29,18 +30,27 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 public class ClienteView extends VerticalLayout {
 
     private final ClienteService clienteService;
-     private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
+    private final Grid<Cliente> grid = new Grid<>(Cliente.class, false);
 
     ToolBarBotonera botonera = new ToolBarBotonera(true, false, false);
-
 
     @Autowired
     public ClienteView(ClienteService clienteService) {
         this.clienteService = clienteService;
         setSizeFull();
-     
-//        add(new H3("Gestión de Clientes"));
+        setSpacing(false);
+      
+        GridListDataView<Cliente> dataView = grid.setItems(clienteService.getLista());
 
+// Crear el filtro avanzado
+        FiltroAvanzado<Cliente> filtro = new FiltroAvanzado<>(dataView);
+
+// Agregar filtros por nombre y cédula
+        filtro.addFiltro("Nombre", Cliente::getNombre);
+        filtro.addFiltro("Cédula", Cliente::getCedula);
+
+
+//        add(new H3("Gestión de Clientes"));
         botonera.getNuevo().addClickListener(e -> {
             // lógica de nuevo
 
@@ -53,8 +63,7 @@ public class ClienteView extends VerticalLayout {
 
         actualizarLista();
 
-
-        add(botonera,grid);
+        add(botonera,filtro, grid);
     }
 
     private void configurarGrid() {
@@ -80,7 +89,7 @@ public class ClienteView extends VerticalLayout {
 
             return new HorizontalLayout(editar);
         }).setHeader("Acciones");
-        
+
     }
 
     private void actualizarLista() {

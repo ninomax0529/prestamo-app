@@ -12,6 +12,7 @@ import com.maxsoft.application.service.PrestamoService;
 import com.maxsoft.application.service.ReciboDeIngresoService;
 import com.maxsoft.application.util.ClaseUtil;
 import com.maxsoft.application.util.NavigationContext;
+import com.maxsoft.application.views.componente.FiltroAvanzado;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.maxsoft.application.views.dialogo.ConfirmDialog;
 import com.maxsoft.application.views.dialogo.PrestamoDialog;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -87,6 +89,17 @@ public class ReciboDeIngresoView extends VerticalLayout {
 //        setSizeFull();
         configureGrid();
 //        configureForm();
+
+   
+         GridListDataView<ReciboDeIngreso> dataView = grid.setItems(this.reciboService.getLista());
+
+// Crear el filtro avanzado
+        FiltroAvanzado<ReciboDeIngreso> filtro = new FiltroAvanzado<>(dataView);
+
+// Agregar filtros por nombre y cédula
+        filtro.addFiltro("Cliente", ReciboDeIngreso::getNombreCliente);
+//        filtro.addFiltro("Prestamo", Prestamo::getCodigo().toStrin);
+
         buscarPrestamo.addClassName("boton-buscar");
         botonera.getNuevo().addClickListener(e -> {
             // lógica de nuevo
@@ -96,7 +109,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
         });
 
-        add(botonera, grid);
+        add(botonera,filtro, grid);
         actualizarGrid();
 
         buscarPrestamo.addClickListener(e -> {
@@ -127,7 +140,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
     private void configureGrid() {
 
         grid.addColumn(r -> r.getCodigo()).setHeader("Recibo").setAutoWidth(true);
-        grid.addColumn(r -> r.getPrestamo() != null ? r.getPrestamo().getCodigo() : "").setHeader("Préstamo");
+        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente");
         grid.addColumn(r -> r.getFecha()).setHeader("Fecha").setAutoWidth(true);
 //        grid.addColumn(r -> r.getNombreCliente()).setHeader("Cliente").setAutoWidth(true);
 //        grid.addColumn(r -> r.getTotal()).setHeader("Total").setAutoWidth(true);
