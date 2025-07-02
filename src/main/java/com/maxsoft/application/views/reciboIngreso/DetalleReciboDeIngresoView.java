@@ -88,6 +88,8 @@ public class DetalleReciboDeIngresoView extends VerticalLayout implements HasUrl
 
         grid.addColumn(DetalleReciboDeIngreso::getNumeroCuota).setHeader("Cuota").setAutoWidth(true);
         grid.addColumn(DetalleReciboDeIngreso::getTotal).setHeader("Total").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getMontoCapital).setHeader("Capital").setAutoWidth(true);
+        grid.addColumn(DetalleReciboDeIngreso::getMontoInteres).setHeader("Interes").setAutoWidth(true);
         grid.addColumn(DetalleReciboDeIngreso::getMontoPendiente).setHeader("Pemdiente").setAutoWidth(true);
         grid.addColumn(DetalleReciboDeIngreso::getConcepto).setHeader("Concepto").setAutoWidth(true);
 
@@ -101,7 +103,7 @@ public class DetalleReciboDeIngresoView extends VerticalLayout implements HasUrl
         txtRecibo.setWidth("30%");
         txtNombreCliente.setWidth("40%");
         txtFecha.setWidth("30%");
-        
+
         txtNombreCliente.setReadOnly(true);
         txtTotal.setReadOnly(true);
         txtFecha.setReadOnly(true);

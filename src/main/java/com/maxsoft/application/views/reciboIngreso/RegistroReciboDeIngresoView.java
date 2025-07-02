@@ -148,24 +148,6 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             checkbox.addValueChangeListener(event -> {
 
-//                Optional<DetallePrestamo> detAnt = gridDetPrestamo.getListDataView().getPreviousItem(editor.getItem());
-//                            
-//                if (editor.getItem().getEstado()==false &&  detAnt.get().getEstado()==true) {
-//
-//                    Notification.show("El acumulada actual no puede ser menor que el acumulado anterior ", 3000, Notification.Position.MIDDLE);
-//                    return;
-//                }
-
-//                if (editor.isOpen()) {
-//                    editor.cancel(); // cierra el editor actual
-//                }
-//                if (checkbox.getValue()) {
-//                    checkbox.setValue(Boolean.FALSE);
-//                } else {
-//                    checkbox.setValue(Boolean.TRUE);
-//                }
-//                editor.editItem(p);
-                //                pendiente.focus();
                 boolean nuevoEstado = event.getValue();
 
                 p.setEstado(nuevoEstado);
@@ -173,7 +155,6 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
                 crearDetalle();
             });
 
-//            checkbox.setReadOnly(true);
             return checkbox;
         }).setHeader("Pagar");
 
@@ -213,6 +194,13 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         Button btnAplicar = new Button("Aplicar", e -> {
 
             editor.getItem().setMontoPendiente(pendiente.getValue());
+
+            if (editor.getItem().getMontoPendiente() > editor.getItem().getValorCuota()) {
+
+                Notification.show("El valor a pagar no puede ser mayor que la cuota", 3000, Notification.Position.TOP_CENTER);
+                return;
+            }
+
             crearDetalle();
             dataProvider.refreshAll();
         });
@@ -244,7 +232,6 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         editColumn.setEditorComponent(actions);
 
 //        gridDetPrestamo.setSizeFull();
-
     }
 
     private FormLayout crearFormulario() {
@@ -398,11 +385,13 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
         dataProvider = (ListDataProvider<DetallePrestamo>) gridDetPrestamo.getDataProvider();
 
         String descPago = "";
-        Double monPendiente, montoPagado = 0.00;
+        Double monPendiente, montoPagado = 0.00, interesPagado = 0.00;
 
         for (DetallePrestamo detP : dataProvider.getItems()) {
 
             if (detP.getEstado() == true) {
+
+                interesPagado = prestamoService.getInteresPagadoCuota(detP.getPrestamo().getCodigo(), detP.getCodigo());
 
                 det = new DetalleReciboDeIngreso();
 
@@ -414,6 +403,39 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
                 det.setRecibo(reciboActual);
                 det.setNumeroCuota(detP.getNumeroCuota());
                 det.setCuota(detP.getCodigo());
+
+                if (det.getTotal() == detP.getValorCuota()) {
+
+                    det.setMontoCapital(detP.getCapital());
+                    det.setMontoInteres(detP.getInteres());
+
+                } else if (det.getTotal() < detP.getValorCuota()) {
+
+                    if (det.getTotal() < detP.getCapital() && det.getTotal() < detP.getInteres()) {
+
+                        interesPagado = detP.getInteres() - interesPagado;
+                        det.setMontoCapital(det.getTotal() - interesPagado);
+                        det.setMontoInteres(interesPagado);
+
+                    } else if (det.getTotal() < detP.getCapital() && det.getTotal() > detP.getInteres()) {
+
+                        interesPagado = detP.getInteres() - interesPagado;
+                        det.setMontoCapital(det.getTotal() - interesPagado);
+                        det.setMontoInteres(interesPagado);
+
+                    } else if (det.getTotal() > detP.getCapital()) {
+
+                        interesPagado = detP.getInteres() - interesPagado;
+
+                        det.setMontoCapital(det.getTotal() - interesPagado);
+                        det.setMontoInteres(interesPagado);
+                    }
+
+                } else {
+
+                    Notification.show("El valor no puede ser mayor que la cuota", 3000, Notification.Position.TOP_CENTER);
+
+                }
 
                 montoPagado += det.getTotal();
 
@@ -464,6 +486,8 @@ public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUr
 
             detP.setMontoPagado(montoPagado);
             detP.setMontoPendiente(monPendiente);
+            detP.setFechaAplicado(new Date());
+            detP.setFechaActualizacion(new Date());
 
         }
 

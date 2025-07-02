@@ -19,12 +19,10 @@ import net.sf.jasperreports.engine.JasperRunManager;
  */
 public class RptPrestamo {
 
-  
-  
     public RptPrestamo() {
     }
 
-    public  StreamResource reciboIngreso(Integer codPrestamo, Connection dataSource) {
+    public StreamResource reciboIngreso(Integer codPrestamo, Connection dataSource) {
 
         StreamResource pdfResource = null;
 
@@ -61,9 +59,8 @@ public class RptPrestamo {
 
         return pdfResource;
     }
-    
-    
-    public  StreamResource prestamoAlCorte(Date fecha, Connection dataSource) {
+
+    public StreamResource prestamoAlCorte(Date fecha, Connection dataSource) {
 
         StreamResource pdfResource = null;
 
@@ -100,9 +97,49 @@ public class RptPrestamo {
 
         return pdfResource;
     }
-    
-        
-    public  StreamResource prestamoPendienteAlCorte(Date fecha, Connection dataSource) {
+
+    public StreamResource prestamo(String StringParam, String descripcion, String estado, Connection dataSource) {
+
+        StreamResource pdfResource = null;
+
+        try {
+
+            System.out.println("StringParam " + StringParam);
+//             Cargar el archivo .jasper desde el classpath
+            InputStream reportStream = getClass().getResourceAsStream("/reporte/prestamo/RptListadoPrestamo.jasper");
+
+//            Date fecha = new Date("2025/03/12");
+            // Parámetros
+//        Map<String, Object> parameters = new HashMap<>();
+            if (reportStream == null) {
+                throw new RuntimeException("El archivo de reporte no se encontró en la ruta .");
+//                return pdfResource;
+
+            }
+
+            // Parámetros para el informe
+            Map<String, Object> parameters = new HashMap<>();
+
+            parameters.put("str_param", StringParam);
+            parameters.put("str_descripcion", descripcion);
+            parameters.put("estado_param", estado);
+
+            System.out.println("jasperPrint : ");
+
+//             Exportar el informe a PDF
+            System.out.println(" dataSource.getConnection() : " + dataSource);
+            byte[] pdfContent = JasperRunManager.runReportToPdf(reportStream, parameters, dataSource);
+
+            pdfResource = new StreamResource("informe.pdf", () -> new ByteArrayInputStream(pdfContent));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return pdfResource;
+    }
+
+    public StreamResource prestamoPendienteAlCorte(Date fecha, Connection dataSource) {
 
         StreamResource pdfResource = null;
 
@@ -110,6 +147,44 @@ public class RptPrestamo {
 
 //             Cargar el archivo .jasper desde el classpath
             InputStream reportStream = getClass().getResourceAsStream("/reporte/prestamo/RptPrestamoPendiente.jasper");
+
+//            Date fecha = new Date("2025/03/12");
+            // Parámetros
+//        Map<String, Object> parameters = new HashMap<>();
+            if (reportStream == null) {
+                throw new RuntimeException("El archivo de reporte no se encontró en la ruta .");
+//                return pdfResource;
+
+            }
+
+            System.out.println("reportStream : " + reportStream);
+            // Parámetros para el informe
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("fecha_param", fecha);
+
+            System.out.println("jasperPrint : ");
+
+//             Exportar el informe a PDF
+            System.out.println(" dataSource.getConnection() : " + dataSource);
+            byte[] pdfContent = JasperRunManager.runReportToPdf(reportStream, parameters, dataSource);
+
+            pdfResource = new StreamResource("informe.pdf", () -> new ByteArrayInputStream(pdfContent));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return pdfResource;
+    }
+
+    public StreamResource prestamoSaldadoAlCorte(Date fecha, Connection dataSource) {
+
+        StreamResource pdfResource = null;
+
+        try {
+
+//             Cargar el archivo .jasper desde el classpath
+            InputStream reportStream = getClass().getResourceAsStream("/reporte/prestamo/RptPrestamoSaldado.jasper");
 
 //            Date fecha = new Date("2025/03/12");
             // Parámetros

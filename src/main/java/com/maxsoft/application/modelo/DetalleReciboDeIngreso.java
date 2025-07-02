@@ -45,6 +45,11 @@ public class DetalleReciboDeIngreso implements Serializable {
     @NotNull
     @Column(name = "total")
     private double total;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "monto_capital")
+    private Double montoCapital;
+    @Column(name = "monto_interes")
+    private Double montoInteres;
     @Basic(optional = false)
     @NotNull
     @Column(name = "monto_pendiente")
@@ -102,6 +107,22 @@ public class DetalleReciboDeIngreso implements Serializable {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Double getMontoCapital() {
+        return montoCapital;
+    }
+
+    public void setMontoCapital(Double montoCapital) {
+        this.montoCapital = montoCapital;
+    }
+
+    public Double getMontoInteres() {
+        return montoInteres;
+    }
+
+    public void setMontoInteres(Double montoInteres) {
+        this.montoInteres = montoInteres;
     }
 
     public double getMontoPendiente() {

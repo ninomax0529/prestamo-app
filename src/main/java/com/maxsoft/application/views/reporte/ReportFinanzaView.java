@@ -8,12 +8,12 @@ package com.maxsoft.application.views.reporte;
  *
  * @author Maximiliano
  */
-import com.maxsoft.application.reporte.RptPrestamo;
+import com.maxsoft.application.reporte.RptFinanza;
+import com.maxsoft.application.reporte.RptReciboIngreso;
 import com.maxsoft.application.util.ClaseUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.IFrame;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -31,10 +31,10 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
-@PageTitle("Reporte Prestamo")
-@Route("/rptPrestamo")
-@Menu(order = 4, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-public class ReportView extends VerticalLayout {
+@PageTitle("Reportes Financiero")
+@Route("/rptFinanza")
+@Menu(order = 6, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+public class ReportFinanzaView extends VerticalLayout {
 
     @Autowired
     DataSource dataSource;
@@ -47,30 +47,21 @@ public class ReportView extends VerticalLayout {
 
     private final DatePicker datePicker = new DatePicker("Fecha");
 
-    public ReportView() {
+    public ReportFinanzaView() {
 
-        //        radioGroup.setLabel("Seleccione una Opcion :");
-        radioGroup.setItems(List.of("Todos", "Pendiente", "Saldado"));
-        radioGroup.setValue("Todos");
+        radioGroup.setItems(List.of("Pendiente", "Todos"));
+        radioGroup.setValue("Pendiente");
 //        radioGroup.setLabel("Empaque");// Mostrar solo el nombre
         datePicker.setValue(LocalDate.now());
 
-        Button generateReportButton = new Button("Generar Reporte", event -> {
+        Button generateReportButton = new Button("Estado de Resultado", event -> {
 
             try (Connection conn = dataSource.getConnection()) {
 
                 Date fecha = ClaseUtil.asDate(datePicker.getValue());
-                RptPrestamo rpt = new RptPrestamo();
+                RptFinanza rpt = new RptFinanza();
 
-                if (radioGroup.getValue().equalsIgnoreCase("Pendiente")) {
-
-                    pdfResource = rpt.prestamoPendienteAlCorte(fecha, conn);
-
-                } else if (radioGroup.getValue().equalsIgnoreCase("Todos")) {
-
-                    pdfResource = rpt.prestamoAlCorte(fecha, conn);
-
-                }
+                pdfResource = rpt.estadoResultadoGerencial(fecha, conn);
 
                 Anchor anchor = new Anchor(pdfResource, "");
                 anchor.getElement().setAttribute("download", false);
@@ -88,7 +79,7 @@ public class ReportView extends VerticalLayout {
         });
 
         h2.setAlignItems(FlexComponent.Alignment.BASELINE);
-        h2.add(datePicker, radioGroup);
+        h2.add(datePicker);
 
         hl.add(generateReportButton);
         add(h2, hl);

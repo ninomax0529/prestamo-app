@@ -31,6 +31,7 @@ public class ClaseUtil {
     private static SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-YYYY");
     private static DecimalFormat df = new DecimalFormat("###,###,###.00");
+    private static DecimalFormat dfSinComa = new DecimalFormat("#########.00");
 
     public ClaseUtil() {
     }
@@ -93,6 +94,11 @@ public class ClaseUtil {
     public static Double formatoNumero(double i) {
 
         return Double.parseDouble(df.format(i));
+    }
+
+    public static Double formatoNumeroSinComa(double i) {
+
+        return Double.parseDouble(dfSinComa.format(i));
     }
 
     public static double FormatearDouble(double i, int posicion) {

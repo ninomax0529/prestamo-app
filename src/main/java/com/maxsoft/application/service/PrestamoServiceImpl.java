@@ -94,10 +94,24 @@ public class PrestamoServiceImpl implements PrestamoService {
 
     @Override
     public Prestamo getPrestamo(int obj) {
-       
-        Prestamo p=repo.getPrestamo(obj);
-        System.out.println("P : "+p);
+
+        Prestamo p = repo.getPrestamo(obj);
+        System.out.println("P : " + p);
         return p;
+    }
+
+    @Override
+    public List<Prestamo> getPrestamoSaldado() {
+
+        List<Prestamo> lista = repo.getPrestamoSaldado();
+        return lista;
+    }
+
+    @Override
+    public Double getInteresPagadoCuota(int codPrestamo, int codCuota) {
+
+        Double monto = repo.getInteresPagadoCuota(codPrestamo, codCuota);
+        return monto == null ? 0.00 : monto;
     }
 
 }

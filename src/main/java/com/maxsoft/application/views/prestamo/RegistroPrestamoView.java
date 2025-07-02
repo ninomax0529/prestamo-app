@@ -54,15 +54,18 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class RegistroPrestamoView extends VerticalLayout implements HasUrlParameter<String> {
 
+    private final Grid<DetallePrestamo> gridDet = new Grid<>(DetallePrestamo.class, false);
     private final PrestamoService prestamoService;
     private final PeriodoService periodoService;
     private final TipoPrestamoService tipoPrestamoService;
     private final ClienteService clienteService;
+    List<DetallePrestamo> listaDetPrestamo = new ArrayList<>();
 
     private final Grid<Prestamo> grid = new Grid<>(Prestamo.class, false);
     private final Binder<Prestamo> binder = new Binder<>(Prestamo.class);
     private Prestamo prestamo = new Prestamo();
-
+    Integer canPeriodo;
+    Double montoCuot = 0.00;
     // Componentes del formulario
     private final DatePicker fechaInicio = new DatePicker("Fecha");
     private final DatePicker fechaPrimerPago = new DatePicker("Fecha Primer Pago");
@@ -87,7 +90,7 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
             ClienteService clienteService) {
 
         setPadding(true);
-        setSpacing(true);
+        setSpacing(false);
         this.prestamoService = prestamoService;
         this.periodoService = periodoService;
         this.tipoPrestamoService = tipoPrestamoService;
@@ -140,10 +143,12 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
         configurarFormulario();
         configurarEventos();
-
-        add(botonera, crearFormulario());
+        configurarGrid();
 
         confiBinder();
+
+        add(botonera, crearFormulario(), gridDet);
+
     }
 
     private void configurarFormulario() {
@@ -207,6 +212,8 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
             try {
 
+                System.out.println("Guardando prestamo ...");
+
                 prestamo.setNombrePeriodo(periodo.getValue().getNombre());
                 prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
                 prestamo.setCreadoPor("ADMIN");
@@ -215,9 +222,21 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
                 binder.writeBean(prestamo);
 
+                listaDetPrestamo.clear();
+                listaDetPrestamo.addAll(crearDetalle(canPeriodo, montoCuot));
+
+                listaDetPrestamo.forEach(d -> {
+
+                    System.out.println("Det capital  " + d.getCapital());
+                    d.setCodigo(null);
+//                    d.setPrestamo(prestamo);
+                });
+
+                prestamo.setDetallePrestamoCollection(listaDetPrestamo);
+
                 prestamoService.guardar(prestamo);
 
-                actualizarGrid();
+//                actualizarGrid();
                 Notification.show("Préstamo guardado");
                 limpiarFormulario();
             } catch (ValidationException ex) {
@@ -244,37 +263,47 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
         btnCalcular.addClickListener((ClickEvent<Button> e) -> {
 
-            Double montoCuot = 0.00, tasaIntere = 0.00, montoPrestad = 0.00, montoInter = 0.00;
-            Integer canPeriodo = Integer.valueOf(cantidadPeriodoField.getValue());
+            Double tasaIntere = 0.00, montoPrestad = 0.00, montoInter = 0.00;
+            canPeriodo = Integer.valueOf(cantidadPeriodoField.getValue());
 
             montoPrestad = this.montoPrestado.getValue();
             montoInter = this.montoIntere.getValue();
             prestamo.setTotalPagado(0.00);
             prestamo.setTotalPendiente(montoPrestad);
 
-            montoCuot = ClaseUtil.FormatearDouble((montoPrestad + montoInter) / canPeriodo, 2);
+            montoCuot = ClaseUtil.formatoNumeroSinComa((montoPrestad + montoInter) / canPeriodo);
 
             tasaIntere = ClaseUtil.FormatearDouble((montoInter / montoPrestad) * 100, 2);
             tasaDeIntere.setValue(tasaIntere);
             this.montoCuota.setValue(montoCuot);
             totalPrestamo.setValue(montoInter + montoPrestad);
 
-            prestamo.setDetallePrestamoCollection(crearDetalle(canPeriodo, montoCuot));
+            listaDetPrestamo.clear();
+
+            listaDetPrestamo.addAll(crearDetalle(canPeriodo, montoCuot));
+
+            gridDet.setItems(listaDetPrestamo);
+
+
+
+
 
         });
 
         btnLimpiar.addClickListener(e -> limpiarFormulario());
     }
-
-    private void actualizarGrid() {
-        grid.setItems(prestamoService.getLista());
-    }
+//
+//    private void actualizarGrid() {
+//        grid.setItems(prestamoService.getLista());
+//    }
 
     private void limpiarFormulario() {
 
         btnGuardar.setEnabled(false);
         prestamo = new Prestamo();
         binder.readBean(prestamo);
+        listaDetPrestamo.clear();
+        gridDet.getDataProvider().refreshAll();
     }
 
     private void confiBinder() {
@@ -341,21 +370,37 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
 
         try {
 
+            System.out.println("Guardando prestamo ...");
+
             prestamo.setNombrePeriodo(periodo.getValue().getNombre());
             prestamo.setNombreTipoPrestamo(tipoPrestamo.getValue().getNombre());
             prestamo.setCreadoPor("ADMIN");
             prestamo.setFechaCreacion(new Date());
-            prestamo.setTotalPendiente(prestamo.getTotal());
+//                prestamo.setTotal();
+
             binder.writeBean(prestamo);
+
+//            listaDetPrestamo.clear();
+//            listaDetPrestamo.addAll(crearDetalle(canPeriodo, montoCuot));
+
+            listaDetPrestamo.forEach(d -> {
+
+                System.out.println("Det capital  " + d.getCapital());
+                d.setCodigo(null);
+//                    d.setPrestamo(prestamo);
+            });
+
+            prestamo.setDetallePrestamoCollection(listaDetPrestamo);
 
             prestamoService.guardar(prestamo);
 
-            actualizarGrid();
-
+//                actualizarGrid();
+//            Notification.show("Préstamo guardado");
             limpiarFormulario();
         } catch (ValidationException ex) {
             Notification.show("Datos inválidos: " + ex.getMessage());
         }
+
     }
 
     private List<DetallePrestamo> crearDetalle(int canCuota, Double valorCuota) {
@@ -369,13 +414,20 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
         prestamo.setFechaPrimerPago(fecha);
         prestamo.setPeriodo(periodo.getValue());
 
+        Double montoInteres, montoCapital;
+
         for (int i = 1; i <= canCuota; i++) {
 
+            montoInteres = montoIntere.getValue() / canCuota;
+            montoCapital = montoPrestado.getValue() / canCuota;
             det = new DetallePrestamo();
+            det.setCodigo(i);
 
             det.setConcepto("pago");
             det.setValorCuota(valorCuota);
-            det.setEstado(true);
+            det.setCapital(ClaseUtil.formatoNumeroSinComa(montoCapital));
+            det.setInteres(ClaseUtil.formatoNumeroSinComa(montoInteres));
+            det.setEstado(false);
 
             det.setFechaAplicado(new Date());
             det.setMontoPagado(0.00);
@@ -418,6 +470,19 @@ public class RegistroPrestamoView extends VerticalLayout implements HasUrlParame
         }
 
         return lista;
+
+    }
+
+    private void configurarGrid() {
+
+        gridDet.addColumn(DetallePrestamo::getNumeroCuota).setHeader("Numero").setAutoWidth(true);
+        gridDet.addColumn(DetallePrestamo::getValorCuota).setHeader("Cuota").setAutoWidth(true);
+        gridDet.addColumn(DetallePrestamo::getCapital).setHeader("Capital").setAutoWidth(true);
+        gridDet.addColumn(DetallePrestamo::getInteres).setHeader("Interes").setAutoWidth(true);
+        
+        gridDet.setItems(listaDetPrestamo);
+//        gridDet.addColumn(DetallePrestamo::getMontoPagado).setHeader("Pagado").setAutoWidth(true);
+//        gridDet.addColumn(DetallePrestamo::getMontoPendiente).setHeader("Pendiente").setAutoWidth(true);
 
     }
 }

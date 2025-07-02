@@ -14,7 +14,6 @@ import com.maxsoft.application.util.NavigationContext;
 import com.maxsoft.application.views.componente.ToolBarBotonera;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
@@ -102,14 +101,17 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
 
         grid.addColumn(DetallePrestamo::getNumeroCuota).setHeader("Numero").setAutoWidth(true);
         grid.addColumn(DetallePrestamo::getValorCuota).setHeader("Cuota").setAutoWidth(true);
+        grid.addColumn(DetallePrestamo::getCapital).setHeader("Capital").setAutoWidth(true);
+        grid.addColumn(DetallePrestamo::getInteres).setHeader("Interes").setAutoWidth(true);
         grid.addColumn(DetallePrestamo::getMontoPagado).setHeader("Pagado").setAutoWidth(true);
         grid.addColumn(DetallePrestamo::getMontoPendiente).setHeader("Pendiente").setAutoWidth(true);
         grid.addColumn(DetallePrestamo::getFecha).setHeader("Fecha").setAutoWidth(true);
-        grid.addComponentColumn(p -> {
-            Icon icon = p.getEstado() ? VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create();
-            icon.setColor(p.getEstado() ? "green" : "red");
-            return icon;
-        }).setHeader("Estado").setAutoWidth(true);
+//        
+//        grid.addComponentColumn(p -> {
+//            Icon icon = p.getEstado() ? VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create();
+//            icon.setColor(p.getEstado() ? "green" : "red");
+//            return icon;
+//        }).setHeader("Estado").setAutoWidth(true);
 
     }
 
@@ -173,7 +175,7 @@ public class DetallePrestamoView extends VerticalLayout implements HasUrlParamet
             txtMontoIntere.setValue(prestamo.getMontoIntere());
             txtMontoPrestado.setValue(prestamo.getMontoPrestado());
             txtTipoPrestamo.setValue(prestamo.getNombreTipoPrestamo());
-              txtTasaDeIntere.setValue(prestamo.getTasaDeIntere());
+            txtTasaDeIntere.setValue(prestamo.getTasaDeIntere());
             txtTotalPrestamo.setValue(prestamo.getTotal());
 
             txtFechaInicio.setValue(prestamo.getFechaInicio().toString());

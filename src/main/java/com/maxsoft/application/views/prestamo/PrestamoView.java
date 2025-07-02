@@ -4,7 +4,6 @@
  */
 package com.maxsoft.application.views.prestamo;
 
-import com.maxsoft.application.modelo.Cliente;
 import com.maxsoft.application.modelo.Periodo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.TipoPrestamo;
@@ -69,7 +68,7 @@ public class PrestamoView extends VerticalLayout {
     private final Button btnLimpiar = new Button("Limpiar", VaadinIcon.REFRESH.create());
     Button buscarClienteBtn = new Button(new Icon(VaadinIcon.SEARCH));
     private final Button btnCalcular = new Button("Calcular");
-      RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+    RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
 
     public PrestamoView(PrestamoService prestamoService, PeriodoService periodoService, TipoPrestamoService tipoPrestamoService,
             ClienteService clienteService) {
@@ -81,12 +80,19 @@ public class PrestamoView extends VerticalLayout {
         this.periodoService = periodoService;
         this.tipoPrestamoService = tipoPrestamoService;
         this.clienteService = clienteService;
-        
+
         //        radioGroup.setLabel("Seleccione una Opcion :");
-        radioGroup.setItems(List.of("Todos","Pendiente","Saldado"));
+        radioGroup.setItems(List.of("Todos", "Pendiente", "Saldado"));
         radioGroup.setValue("Todos");
-        
-         GridListDataView<Prestamo> dataView = grid.setItems(this.prestamoService.getLista());
+
+        radioGroup.addValueChangeListener(e -> {
+
+            String seleccion = e.getValue();
+            Notification.show("Seleccionaste: " + seleccion);
+            actualizarGrid();
+        });
+
+        GridListDataView<Prestamo> dataView = grid.setItems(this.prestamoService.getLista());
 
 // Crear el filtro avanzado
         FiltroAvanzado<Prestamo> filtro = new FiltroAvanzado<>(dataView);
@@ -95,7 +101,6 @@ public class PrestamoView extends VerticalLayout {
         filtro.addFiltro("Cliente", Prestamo::getNombreCliente);
 //        filtro.addFiltro("Prestamo", Prestamo::getCodigo().toStrin);
 
-        
         btnGuardar.setEnabled(false);
 
         botonera.getNuevo().addClickListener(e -> {
@@ -115,7 +120,7 @@ public class PrestamoView extends VerticalLayout {
         configurarGrid();
 //        configurarEventos();
 
-        add(botonera,radioGroup,filtro, grid);
+        add(botonera, radioGroup, filtro, grid);
         actualizarGrid();
 
     }
@@ -266,7 +271,21 @@ public class PrestamoView extends VerticalLayout {
     }
 
     private void actualizarGrid() {
-        grid.setItems(prestamoService.getLista());
+
+        if (radioGroup.getValue().equalsIgnoreCase("Todos")) {
+
+            grid.setItems(prestamoService.getLista());
+
+        } else if (radioGroup.getValue().equalsIgnoreCase("Pendiente")) {
+
+            grid.setItems(prestamoService.getPrestamoPendiente());
+
+        } else if (radioGroup.getValue().equalsIgnoreCase("Saldado")) {
+
+            grid.setItems(prestamoService.getPrestamoSaldado());
+        }
+
+  
     }
 
     private void limpiarFormulario() {

@@ -12,6 +12,7 @@ import com.maxsoft.application.reporte.RptPrestamo;
 import com.maxsoft.application.reporte.RptReciboIngreso;
 import com.maxsoft.application.util.ClaseUtil;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.notification.Notification;
@@ -45,7 +46,11 @@ public class ReportReciboView extends VerticalLayout {
     // Crear RadioButtonGroup
     RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
 
-    private final DatePicker datePicker = new DatePicker("Fecha");
+    private final DatePicker datePickerIni = new DatePicker("Fecha Desde");
+    private final DatePicker datePickerFin = new DatePicker("Fecha Hasta");
+
+    Checkbox chAlCorte = new Checkbox("A la Fecha");
+    Date fechaIni, fechaFin;
 
     public ReportReciboView() {
 
@@ -53,24 +58,139 @@ public class ReportReciboView extends VerticalLayout {
         radioGroup.setItems(List.of("Pendiente", "Todos"));
         radioGroup.setValue("Pendiente");
 //        radioGroup.setLabel("Empaque");// Mostrar solo el nombre
-        datePicker.setValue(LocalDate.now());
+        datePickerIni.setValue(LocalDate.now());
+        datePickerFin.setValue(LocalDate.now());
 
         Button generateReportButton = new Button("Generar Reporte", event -> {
 
             try (Connection conn = dataSource.getConnection()) {
 
-                Date fecha = ClaseUtil.asDate(datePicker.getValue());
-                RptReciboIngreso rpt = new RptReciboIngreso();
+                fechaIni = ClaseUtil.asDate(datePickerIni.getValue());
+                fechaFin = ClaseUtil.asDate(datePickerFin.getValue());
 
-//                if (radioGroup.getValue().equalsIgnoreCase("Pendiente")) {
+                RptReciboIngreso rpt = new RptReciboIngreso();
+                StringBuilder stringBuilder = new StringBuilder();
+
+                String strDescripcion;
+
+                if (chAlCorte.getValue()) {
+
+                    stringBuilder.append("where fecha_inicio<='")
+                            .append(ClaseUtil.formatoFecha(fechaFin))
+                            .append("'");
+
+                    strDescripcion = "Al corte: " + ClaseUtil.formatoFecha(fechaFin);
+
+                } else {
+
+                    stringBuilder.append(" where fecha between '")
+                            .append(ClaseUtil.formatoFecha(fechaIni))
+                            .append("' and '")
+                            .append(ClaseUtil.formatoFecha(fechaFin))
+                            .append("'");
+
+                    strDescripcion = "Desde: " + ClaseUtil.formatoFecha(fechaIni)
+                            + "  Hasta: " + ClaseUtil.formatoFecha(fechaFin);
+                }
+
+                rpt.prestamo(stringBuilder.toString(), strDescripcion, conn);
+
+                Anchor anchor = new Anchor(pdfResource, "");
+                anchor.getElement().setAttribute("download", false);
+                anchor.getElement().setAttribute("target", "_blank");
+
+                anchor.getElement().callJsFunction("click"); // dispara la apertura automática
+
+                add(anchor);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Notification.show("Error al generar el reporte");
+            }
+
+        });
+
+        Button generateReportButton1 = new Button("Reporte Cobros ", event -> {
+
+//            try (Connection conn = dataSource.getConnection()) {
+//                fechaIni = ClaseUtil.asDate(datePickerIni.getValue());
+//                fechaFin = ClaseUtil.asDate(datePickerFin.getValue());
 //
-                    pdfResource = rpt.listaReciboAlCorte(fecha, conn);
+//                RptReciboIngreso rpt = new RptReciboIngreso();
+//                StringBuilder stringBuilder = new StringBuilder();
 //
-//                } else if (radioGroup.getValue().equalsIgnoreCase("Todos")) {
+//                String strDescripcion;
 //
-//                    pdfResource = rpt.prestamoAlCorte(fecha, conn);
+//                if (chAlCorte.getValue()) {
 //
+//                    stringBuilder.append("where fecha<='")
+//                            .append(ClaseUtil.formatoFecha(fechaFin))
+//                            .append("'");
+//
+//                    strDescripcion = "Al corte: " + ClaseUtil.formatoFecha(fechaFin);
+//
+//                } else {
+//
+//                    stringBuilder.append(" where fecha between '")
+//                            .append(ClaseUtil.formatoFecha(fechaIni))
+//                            .append("' and '")
+//                            .append(ClaseUtil.formatoFecha(fechaFin))
+//                            .append("'");
+//
+//                    strDescripcion = "Desde: " + ClaseUtil.formatoFecha(fechaIni)
+//                            + "  Hasta: " + ClaseUtil.formatoFecha(fechaFin);
 //                }
+//
+//                rpt.recibo(stringBuilder.toString(), strDescripcion, conn);
+//
+//                Anchor anchor = new Anchor(pdfResource, "");
+//                anchor.getElement().setAttribute("download", false);
+//                anchor.getElement().setAttribute("target", "_blank");
+//
+//                anchor.getElement().callJsFunction("click"); // dispara la apertura automática
+//
+//                add(anchor);
+//
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//                Notification.show("Error al generar el reporte");
+//            }
+            try (Connection conn = dataSource.getConnection()) {
+
+                RptPrestamo rpt = new RptPrestamo();
+
+                RptReciboIngreso rptr = new RptReciboIngreso();
+
+                fechaIni = ClaseUtil.asDate(datePickerIni.getValue());
+                fechaFin = ClaseUtil.asDate(datePickerFin.getValue());
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                String strDescripcion, estado = "Todos";
+
+                if (chAlCorte.getValue()) {
+
+                    stringBuilder.append("where fecha<='")
+                            .append(ClaseUtil.formatoFecha(fechaFin))
+                            .append("'");
+
+                    strDescripcion = "Al corte: " + ClaseUtil.formatoFecha(fechaFin);
+
+                } else {
+
+                    stringBuilder.append(" where fecha between '")
+                            .append(ClaseUtil.formatoFecha(fechaIni))
+                            .append("' and '")
+                            .append(ClaseUtil.formatoFecha(fechaFin))
+                            .append("'");
+
+                    strDescripcion = "Desde: " + ClaseUtil.formatoFecha(fechaIni)
+                            + "  Hasta: " + ClaseUtil.formatoFecha(fechaFin);
+                }
+
+
+//                pdfResource = rpt.prestamo(stringBuilder.toString(), strDescripcion, estado, conn);
+                   pdfResource = rptr.recibo(stringBuilder.toString(), strDescripcion, conn);
 
                 Anchor anchor = new Anchor(pdfResource, "");
                 anchor.getElement().setAttribute("download", false);
@@ -88,10 +208,22 @@ public class ReportReciboView extends VerticalLayout {
         });
 
         h2.setAlignItems(FlexComponent.Alignment.BASELINE);
-        h2.add(datePicker);
+        h2.add(datePickerIni, datePickerFin);
 
-        hl.add(generateReportButton);
-        add(h2, hl);
+        chAlCorte.addClickListener(e -> {
+
+            if (chAlCorte.getValue()) {
+
+                datePickerIni.setEnabled(false);
+            } else {
+
+                datePickerIni.setEnabled(true);
+            }
+
+        });
+
+        hl.add(generateReportButton1);
+        add(chAlCorte, h2, hl);
 
     }
 

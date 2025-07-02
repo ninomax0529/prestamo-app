@@ -5,6 +5,8 @@
 package com.maxsoft.application.views.reciboIngreso;
 
 import com.maxsoft.application.modelo.Cliente;
+import com.maxsoft.application.modelo.DetallePrestamo;
+import com.maxsoft.application.modelo.DetalleReciboDeIngreso;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.modelo.ReciboDeIngreso;
 import com.maxsoft.application.reporte.RptReciboIngreso;
@@ -90,8 +92,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
         configureGrid();
 //        configureForm();
 
-   
-         GridListDataView<ReciboDeIngreso> dataView = grid.setItems(this.reciboService.getLista());
+        GridListDataView<ReciboDeIngreso> dataView = grid.setItems(this.reciboService.getLista());
 
 // Crear el filtro avanzado
         FiltroAvanzado<ReciboDeIngreso> filtro = new FiltroAvanzado<>(dataView);
@@ -109,7 +110,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
         });
 
-        add(botonera,filtro, grid);
+        add(botonera, filtro, grid);
         actualizarGrid();
 
         buscarPrestamo.addClickListener(e -> {
@@ -178,7 +179,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
                 }
 
             });
-            
+
             verBtn.getElement().setAttribute("title", "Ver");
 
             // Botón Detalle
@@ -197,7 +198,7 @@ public class ReciboDeIngresoView extends VerticalLayout {
             detalleBtn.getElement().setAttribute("title", "Detalle");
 
             // Botón Anular
-            Button anularBtn = new Button(VaadinIcon.CLOSE_CIRCLE.create(), click -> {
+            Button anularBtn = new Button(VaadinIcon.CLOSE_CIRCLE.create(), (var click) -> {
 
                 try {
 
@@ -220,6 +221,13 @@ public class ReciboDeIngresoView extends VerticalLayout {
 
                                     prestamo.setTotalPagado(montoPagado);
                                     prestamo.setTotalPendiente(montoPend);
+
+                                    List<DetallePrestamo> listaDetPre = prestamoService.getDetalleCuotaPendiente(prestamo.getCodigo());
+                                    List<DetalleReciboDeIngreso> listaDetRecibo = reciboService.getDetalleRecibo(recibo.getCodigo());
+
+                                    listaDetPre = actualizarDetallePresramo(listaDetPre, listaDetRecibo);
+                                    
+                                    prestamo.setDetallePrestamoCollection(listaDetPre);
 
                                     prestamoService.guardar(prestamo);
 
@@ -249,8 +257,6 @@ public class ReciboDeIngresoView extends VerticalLayout {
             return acciones;
         }).setHeader("Acciones").setAutoWidth(true);
 
-        
-        
         grid.asSingleSelect().addValueChangeListener(event -> {
             reciboActual = event.getValue();
             if (reciboActual != null) {
@@ -304,43 +310,43 @@ public class ReciboDeIngresoView extends VerticalLayout {
 //        );
 //        return form;
 //    }
-
-    private void guardar() {
-
-        try {
-
-            if (reciboActual == null) {
-                reciboActual = new ReciboDeIngreso();
-            }
-
-            Double montoPend, montoPagado;
-
-            binder.writeBean(reciboActual);
-            reciboActual.setFechaCreacion(new Date());
-            reciboActual.setFecha(ClaseUtil.asDate(dpFecha.getValue()));
-            reciboActual.setCliente(cliente);
-            reciboActual.setPrestamo(prestamo);
-            reciboActual.setTotal(txtValorCuota.getValue());
-
-            montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
-            montoPend = montoPend - reciboActual.getTotal();
-
-            reciboActual.setMontoPendiente(montoPend);
-
-            reciboService.guardar(reciboActual);
-
-            montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
-            prestamo.setTotalPagado(montoPagado);
-            prestamo.setTotalPendiente(montoPend);
-
-            prestamoService.guardar(prestamo);
-
-            actualizarGrid();
-            limpiarFormulario();
-        } catch (ValidationException e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private void guardar() {
+//
+//        try {
+//
+//            if (reciboActual == null) {
+//                reciboActual = new ReciboDeIngreso();
+//            }
+//
+//            Double montoPend, montoPagado;
+//
+//            binder.writeBean(reciboActual);
+//            reciboActual.setFechaCreacion(new Date());
+//            reciboActual.setFecha(ClaseUtil.asDate(dpFecha.getValue()));
+//            reciboActual.setCliente(cliente);
+//            reciboActual.setPrestamo(prestamo);
+//            reciboActual.setTotal(txtValorCuota.getValue());
+//
+//            montoPend = prestamoService.getMontoPendiente(prestamo.getCodigo());
+//            montoPend = montoPend - reciboActual.getTotal();
+//
+//            reciboActual.setMontoPendiente(montoPend);
+//
+//            reciboService.guardar(reciboActual);
+//
+//            montoPagado = prestamoService.getMontoPagado(prestamo.getCodigo());
+//            prestamo.setTotalPagado(montoPagado);
+//            prestamo.setTotalPendiente(montoPend);
+//
+//            prestamoService.guardar(prestamo);
+//
+//            actualizarGrid();
+//            limpiarFormulario();
+//        } catch (ValidationException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void limpiarFormulario() {
 
@@ -356,6 +362,30 @@ public class ReciboDeIngresoView extends VerticalLayout {
     private void actualizarGrid() {
         List<ReciboDeIngreso> lista = reciboService.getLista(false);
         grid.setItems(lista);
+    }
+
+    private List<DetallePrestamo> actualizarDetallePresramo(List<DetallePrestamo> listarP, List<DetalleReciboDeIngreso> listaReci) {
+
+        Double monPendiente, montoPagado;
+
+        int codPrestamo;
+        for (DetallePrestamo detP : listarP) {
+
+            codPrestamo = detP.getPrestamo().getCodigo();
+
+            for (DetalleReciboDeIngreso detRecibo : listaReci) {
+
+                monPendiente = prestamoService.getMontoPendienteCuota(codPrestamo, detRecibo.getCuota());
+                montoPagado = prestamoService.getMontoPagadoCuota(codPrestamo, detRecibo.getCuota());
+
+                detP.setMontoPagado(montoPagado);
+                detP.setMontoPendiente(monPendiente);
+                detP.setFechaActualizacion(new Date());
+
+            }
+        }
+
+        return listarP;
     }
 
 }

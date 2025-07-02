@@ -25,6 +25,14 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
     @Query(value = strPrestamoPend, nativeQuery = true)
     public List<Prestamo> getPrestamoPendiente();
 
+    String strPrestamoSaldado = """
+                       select  * from  prestamo  p
+                       where anulado=false
+                       and  (total-F_TOTAL_ABONO(p.codigo))<=0 """;
+
+    @Query(value = strPrestamoSaldado, nativeQuery = true)
+    public List<Prestamo> getPrestamoSaldado();
+
     String strDetPrestamo = """
                       select * from  detalle_prestamo  d
                        where 
@@ -68,6 +76,14 @@ public interface PrestamoRepo extends JpaRepository<Prestamo, Integer> {
 
     @Query(value = strMontoPagadoCuota, nativeQuery = true)
     public Double getMontoPagadoCuota(@Param("codPrestamo") int codPrestamo, @Param("codCuota") int codCuota);
+
+    String strInteresPagadoCuota = """
+                              select 
+                                 F_INTERES_PAGADO_A_CUOTA(:codPrestamo,:codCuota)
+                             """;
+
+    @Query(value = strInteresPagadoCuota, nativeQuery = true)
+    public Double getInteresPagadoCuota(@Param("codPrestamo") int codPrestamo, @Param("codCuota") int codCuota);
 
     String strMontPendiente = """
                                

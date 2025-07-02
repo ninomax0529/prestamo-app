@@ -58,6 +58,14 @@ public class DetallePrestamo implements Serializable {
     private double valorCuota;
     @Basic(optional = false)
     @NotNull
+    @Column(name = "capital")
+    private double capital;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "interes")
+    private double interes;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "monto_pagado")
     private double montoPagado;
     @Basic(optional = false)
@@ -73,6 +81,9 @@ public class DetallePrestamo implements Serializable {
     @NotNull
     @Column(name = "estado")
     private boolean estado;
+    @Column(name = "fecha_actualizacion")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaActualizacion;
     @JoinColumn(name = "prestamo", referencedColumnName = "codigo")
     @ManyToOne(optional = false)
     private Prestamo prestamo;
@@ -84,11 +95,13 @@ public class DetallePrestamo implements Serializable {
         this.codigo = codigo;
     }
 
-    public DetallePrestamo(Integer codigo, Date fecha, int numeroCuota, double valorCuota, double montoPagado, double montoPendiente, String concepto, boolean estado) {
+    public DetallePrestamo(Integer codigo, Date fecha, int numeroCuota, double valorCuota, double capital, double interes, double montoPagado, double montoPendiente, String concepto, boolean estado) {
         this.codigo = codigo;
         this.fecha = fecha;
         this.numeroCuota = numeroCuota;
         this.valorCuota = valorCuota;
+        this.capital = capital;
+        this.interes = interes;
         this.montoPagado = montoPagado;
         this.montoPendiente = montoPendiente;
         this.concepto = concepto;
@@ -135,6 +148,22 @@ public class DetallePrestamo implements Serializable {
         this.valorCuota = valorCuota;
     }
 
+    public double getCapital() {
+        return capital;
+    }
+
+    public void setCapital(double capital) {
+        this.capital = capital;
+    }
+
+    public double getInteres() {
+        return interes;
+    }
+
+    public void setInteres(double interes) {
+        this.interes = interes;
+    }
+
     public double getMontoPagado() {
         return montoPagado;
     }
@@ -165,6 +194,14 @@ public class DetallePrestamo implements Serializable {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public Date getFechaActualizacion() {
+        return fechaActualizacion;
+    }
+
+    public void setFechaActualizacion(Date fechaActualizacion) {
+        this.fechaActualizacion = fechaActualizacion;
     }
 
     public Prestamo getPrestamo() {
