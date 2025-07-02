@@ -65,14 +65,17 @@ CREATE TABLE `detalle_prestamo` (
   `prestamo` int NOT NULL,
   `numero_cuota` int NOT NULL,
   `valor_cuota` double NOT NULL,
+  `capital` double NOT NULL,
+  `interes` double NOT NULL,
   `monto_pagado` double NOT NULL,
   `monto_pendiente` double NOT NULL,
   `concepto` varchar(45) NOT NULL,
   `estado` bit(1) NOT NULL,
+  `fecha_actualizacion` datetime DEFAULT NULL,
   PRIMARY KEY (`codigo`),
   KEY `fk_det_prestamo_idx` (`prestamo`),
   CONSTRAINT `fk_det_prestamo` FOREIGN KEY (`prestamo`) REFERENCES `prestamo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +84,7 @@ CREATE TABLE `detalle_prestamo` (
 
 LOCK TABLES `detalle_prestamo` WRITE;
 /*!40000 ALTER TABLE `detalle_prestamo` DISABLE KEYS */;
-INSERT INTO `detalle_prestamo` VALUES (1,'2025-06-30','2025-06-25 16:49:30',1,1,1000,1000,0,'pago',_binary ''),(2,'2025-07-15','2025-06-25 16:49:30',1,2,1000,1000,0,'pago',_binary ''),(3,'2025-07-30','2025-06-25 16:49:30',1,3,1000,1000,0,'pago',_binary ''),(4,'2025-08-14','2025-06-25 16:49:30',1,4,1000,1000,0,'pago',_binary ''),(5,'2025-08-29','2025-06-25 16:49:30',1,5,1000,1000,0,'pago',_binary ''),(6,'2025-09-13','2025-06-25 16:49:30',1,6,1000,300,700,'pago',_binary ''),(7,'2025-06-27','2025-06-25 16:54:39',2,1,1250,1250,0,'pago',_binary ''),(8,'2025-07-04','2025-06-25 16:54:39',2,2,1250,1250,0,'pago',_binary ''),(9,'2025-07-11','2025-06-25 16:54:39',2,3,1250,0,1250,'pago',_binary '\0'),(10,'2025-07-18','2025-06-25 16:54:39',2,4,1250,0,1250,'pago',_binary '\0'),(11,'2025-07-15','2025-06-25 16:56:29',3,1,1250,1250,0,'pago',_binary ''),(12,'2025-07-30','2025-06-25 16:56:29',3,2,1250,750,500,'pago',_binary ''),(13,'2025-08-14','2025-06-25 16:56:29',3,3,1250,0,1250,'pago',_binary '\0'),(14,'2025-08-29','2025-06-25 16:56:29',3,4,1250,0,1250,'pago',_binary '\0'),(15,'2025-09-13','2025-06-25 16:56:29',3,5,1250,0,1250,'pago',_binary '\0'),(16,'2025-09-28','2025-06-25 16:56:29',3,6,1250,0,1250,'pago',_binary '\0'),(17,'2025-06-30','2025-06-26 11:22:32',4,1,1000,1000,0,'pago',_binary ''),(18,'2025-07-15','2025-06-26 11:22:32',4,2,1000,1000,0,'pago',_binary ''),(19,'2025-07-30','2025-06-26 11:22:32',4,3,1000,1000,0,'pago',_binary ''),(20,'2025-08-14','2025-06-26 11:22:32',4,4,1000,1000,0,'pago',_binary ''),(21,'2025-08-29','2025-06-26 11:22:32',4,5,1000,1000,0,'pago',_binary ''),(22,'2025-09-13','2025-06-26 11:22:32',4,6,1000,1000,0,'pago',_binary '');
+INSERT INTO `detalle_prestamo` VALUES (29,'2025-07-05','2025-07-01 16:47:59',12,1,2400,2000,400,2400,0,'pago',_binary '','2025-07-01 16:47:59'),(30,'2025-07-06','2025-07-01 17:01:50',12,2,2400,2000,400,2400,0,'pago',_binary '','2025-07-01 17:01:50'),(31,'2025-07-07','2025-07-01 17:12:52',12,3,2400,2000,400,2400,0,'pago',_binary '','2025-07-01 17:12:52'),(32,'2025-07-08','2025-07-01 17:12:52',12,4,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(33,'2025-07-09','2025-07-01 17:12:52',12,5,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(34,'2025-07-10','2025-07-01 17:12:52',12,6,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(35,'2025-07-11','2025-07-01 17:12:52',12,7,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(36,'2025-07-12','2025-07-01 17:12:52',12,8,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(37,'2025-07-13','2025-07-01 17:12:52',12,9,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(38,'2025-07-14','2025-07-01 17:12:52',12,10,2400,2000,400,0,2400,'pago',_binary '\0','2025-07-01 17:12:52'),(39,'2025-07-15','2025-07-01 11:18:32',13,1,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(40,'2025-07-30','2025-07-01 11:18:32',13,2,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(41,'2025-08-14','2025-07-01 11:18:32',13,3,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(42,'2025-08-29','2025-07-01 11:18:32',13,4,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(43,'2025-09-13','2025-07-01 11:18:32',13,5,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(44,'2025-09-28','2025-07-01 11:18:32',13,6,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(45,'2025-10-13','2025-07-01 11:18:32',13,7,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(46,'2025-10-28','2025-07-01 11:18:32',13,8,3000,2500,500,0,3000,'pago',_binary '\0',NULL),(47,'2025-07-04','2025-07-02 09:22:32',14,1,1250,1000,250,0,1250,'pago',_binary '\0',NULL),(48,'2025-07-11','2025-07-02 09:22:32',14,2,1250,1000,250,0,1250,'pago',_binary '\0',NULL),(49,'2025-07-18','2025-07-02 09:22:32',14,3,1250,1000,250,0,1250,'pago',_binary '\0',NULL),(50,'2025-07-25','2025-07-02 09:22:32',14,4,1250,1000,250,0,1250,'pago',_binary '\0',NULL),(51,'2025-07-04','2025-07-02 11:21:19',15,1,1250,1000,250,1250,0,'pago',_binary '','2025-07-02 11:21:19'),(52,'2025-07-11','2025-07-02 11:21:55',15,2,1250,1000,250,1250,0,'pago',_binary '','2025-07-02 11:21:55');
 /*!40000 ALTER TABLE `detalle_prestamo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -98,12 +101,14 @@ CREATE TABLE `detalle_recibo_de_ingreso` (
   `cuota` int DEFAULT NULL,
   `numero_cuota` int DEFAULT NULL,
   `total` double NOT NULL,
+  `monto_capital` double DEFAULT NULL,
+  `monto_interes` double DEFAULT NULL,
   `monto_pendiente` double NOT NULL,
   `concepto` varchar(120) NOT NULL,
   PRIMARY KEY (`codigo`),
   KEY `fk_det_recibo_idx` (`recibo`),
   CONSTRAINT `fk_det_recibo` FOREIGN KEY (`recibo`) REFERENCES `recibo_de_ingreso` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +117,7 @@ CREATE TABLE `detalle_recibo_de_ingreso` (
 
 LOCK TABLES `detalle_recibo_de_ingreso` WRITE;
 /*!40000 ALTER TABLE `detalle_recibo_de_ingreso` DISABLE KEYS */;
-INSERT INTO `detalle_recibo_de_ingreso` VALUES (1,1,11,1,1250,0,'Pago cuota 1 de 6'),(2,2,1,1,500,500,'Abono a cuota numero 1'),(3,3,1,1,500,0,'Abono a cuota numero 1'),(4,4,2,2,1000,0,'Pago cuota 2 de 6'),(5,5,3,3,1000,0,'Pago cuota 3 de 6'),(6,6,4,4,500,500,'Abono a cuota numero 4'),(7,7,4,4,300,200,'Abono a cuota numero 4'),(8,7,5,5,600,400,'Abono a cuota numero 5'),(9,8,4,4,100,100,'Abono a cuota numero 4'),(10,8,5,5,400,0,'Abono a cuota numero 5'),(11,9,4,4,50,50,'Abono a cuota numero 4'),(12,10,4,4,50,0,'Abono a cuota numero 4'),(13,10,6,6,300,700,'Abono a cuota numero 6'),(14,11,7,1,100,1150,'Abono a cuota numero 1'),(15,12,7,1,250,900,'Abono a cuota numero 1'),(16,13,7,1,450,450,'Abono a cuota numero 1'),(17,14,7,1,450,0,'Abono a cuota numero 1'),(18,14,8,2,1250,0,'Pago cuota 2 de 4'),(19,15,11,1,1250,0,'Pago cuota 1 de 6'),(20,16,12,2,500,750,'Abono a cuota numero 2'),(21,17,11,1,0,1250,'Abono a cuota numero 1'),(22,18,11,1,1250,0,'Pago cuota 1 de 6'),(23,19,12,2,750,500,'Abono a cuota numero 2'),(24,20,17,1,1000,0,'Pago cuota 1 de 6'),(25,20,18,2,500,500,'Abono a cuota numero 2'),(26,21,18,2,120,380,'Abono a cuota numero 2'),(27,22,18,2,380,0,'Abono a cuota numero 2'),(28,22,19,3,1000,0,'Pago cuota 3 de 6'),(29,22,20,4,1000,0,'Pago cuota 4 de 6'),(30,22,21,5,1000,0,'Pago cuota 5 de 6'),(31,22,22,6,1000,0,'Pago cuota 6 de 6');
+INSERT INTO `detalle_recibo_de_ingreso` VALUES (37,28,29,1,300,0,300,2100,'Abono a cuota numero 1'),(38,29,29,1,2100,1700,400,0,'Abono a cuota numero 1'),(39,30,29,1,2100,1800,100,0,'Abono a cuota numero 1'),(40,31,29,1,2100,2000,100,0,'Abono a cuota numero 1'),(41,32,30,2,500,100,400,1900,'Abono a cuota numero 2'),(42,33,30,2,1900,1900,0,0,'Abono a cuota numero 2'),(43,34,31,3,2100,1700,400,300,'Abono a cuota numero 3'),(44,35,31,3,100,100,0,200,'Abono a cuota numero 3'),(45,36,31,3,200,200,0,0,'Abono a cuota numero 3'),(46,37,31,3,200,200,0,0,'Abono a cuota numero 3'),(47,38,51,1,1250,1000,250,0,'Pago cuota 1 de 2'),(48,39,52,2,1250,1000,250,0,'Pago cuota 2 de 2');
 /*!40000 ALTER TABLE `detalle_recibo_de_ingreso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -183,7 +188,7 @@ CREATE TABLE `prestamo` (
   CONSTRAINT `fk_prestamo_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`codigo`),
   CONSTRAINT `fk_prestamo_periodo` FOREIGN KEY (`periodo`) REFERENCES `periodo` (`codigo`),
   CONSTRAINT `fk_prestamo_tp` FOREIGN KEY (`tipo_prestamo`) REFERENCES `tipo_prestamo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,7 +197,7 @@ CREATE TABLE `prestamo` (
 
 LOCK TABLES `prestamo` WRITE;
 /*!40000 ALTER TABLE `prestamo` DISABLE KEYS */;
-INSERT INTO `prestamo` VALUES (1,'2025-06-25',NULL,1,'SAM',7,'QUINCENAL',6,1,'JOSEFINA DE LOS RIO',20,5000,1000,6000,5300,700,1000,'ADMIN','2025-06-25 16:49:50',NULL,NULL,_binary '\0',NULL,NULL,'2025-06-30'),(2,'2025-06-25',NULL,3,'PERSONAL',6,'SEMANAL',4,6,'MAXIMILIANO ALMONTE',25,4000,1000,5000,2500,2500,1250,'ADMIN','2025-06-25 16:54:53',NULL,NULL,_binary '\0',NULL,NULL,'2025-06-27'),(3,'2025-06-25',NULL,1,'SAM',7,'QUINCENAL',6,11,'BERNALDO GOMEZ',25,6000,1500,7500,2000,5500,1250,'ADMIN','2025-06-25 16:56:38',NULL,NULL,_binary '\0',NULL,NULL,'2025-07-15'),(4,'2025-06-26',NULL,1,'SAM',7,'QUINCENAL',6,4,'Pepe rodriguez',20,5000,1000,6000,6000,0,1000,'ADMIN','2025-06-26 11:22:47',NULL,NULL,_binary '\0',NULL,NULL,'2025-06-30');
+INSERT INTO `prestamo` VALUES (12,'2025-07-01',NULL,1,' SAM',5,'DIARIO',10,1,'JOSEFINA DE LOS RIO',20,20000,4000,24000,7200,16800,2400,'ADMIN','2025-07-01 11:13:18',NULL,NULL,_binary '\0',NULL,NULL,'2025-07-05'),(13,'2025-07-01',NULL,3,'PERSONAL',7,'QUINCENAL',8,4,'Pepe rodriguez',20,20000,4000,24000,0,20000,3000,'ADMIN','2025-07-01 11:19:38',NULL,NULL,_binary '\0',NULL,NULL,'2025-07-15'),(14,'2025-07-02',NULL,1,' SAM',6,'SEMANAL',4,8,'RAFAEL PEREZ',25,4000,1000,5000,0,4000,1250,'ADMIN','2025-07-02 09:22:46',NULL,NULL,_binary '\0',NULL,NULL,'2025-07-04'),(15,'2025-07-02',NULL,1,' SAM',6,'SEMANAL',2,10,'EUGENIO ALMONTE JIMENEZ',25,2000,500,2500,2500,0,1250,'ADMIN','2025-07-02 11:21:02',NULL,NULL,_binary '\0',NULL,NULL,'2025-07-04');
 /*!40000 ALTER TABLE `prestamo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -222,7 +227,7 @@ CREATE TABLE `recibo_de_ingreso` (
   KEY `fk_recibo_prestamo_idx` (`prestamo`),
   CONSTRAINT `fk_recibo_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`codigo`),
   CONSTRAINT `fk_recibo_prestamo` FOREIGN KEY (`prestamo`) REFERENCES `prestamo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,7 +236,7 @@ CREATE TABLE `recibo_de_ingreso` (
 
 LOCK TABLES `recibo_de_ingreso` WRITE;
 /*!40000 ALTER TABLE `recibo_de_ingreso` DISABLE KEYS */;
-INSERT INTO `recibo_de_ingreso` VALUES (1,'2025-06-25',3,11,'BERNALDO GOMEZ',1250,6250,'ADMIN','2025-06-25 16:57:24',_binary '','ADMIN','2025-06-25 17:07:17','Pago cuota 1 de 6\n'),(2,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',1000,5000,'ADMIN','2025-06-25 17:09:42',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(3,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',1000,4500,'ADMIN','2025-06-25 17:14:54',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(4,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',1000,5000,'ADMIN','2025-06-25 17:29:39',_binary '\0',NULL,NULL,'Pago cuota 2 de 6\n'),(5,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',1000,3000,'ADMIN','2025-06-25 17:33:11',_binary '\0',NULL,NULL,'Pago cuota 3 de 6\n'),(6,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',1000,2000,'ADMIN','2025-06-25 17:34:53',_binary '\0',NULL,NULL,'Abono a cuota numero 4\n'),(7,'2025-06-25',1,1,'JOSEFINA DE LOS RIO',0,1600,'ADMIN','2025-06-25 17:49:42',_binary '\0',NULL,NULL,'Abono a cuota numero 4\nAbono a cuota numero 5\n'),(8,'2025-06-26',1,1,'JOSEFINA DE LOS RIO',500,1100,'ADMIN','2025-06-26 09:53:35',_binary '\0',NULL,NULL,'Abono a cuota numero 4\nAbono a cuota numero 5\n'),(9,'2025-06-26',1,1,'JOSEFINA DE LOS RIO',50,1050,'ADMIN','2025-06-26 09:54:37',_binary '\0',NULL,NULL,'Abono a cuota numero 4\n'),(10,'2025-06-26',1,1,'JOSEFINA DE LOS RIO',350,700,'ADMIN','2025-06-26 09:55:06',_binary '\0',NULL,NULL,'Abono a cuota numero 4\nAbono a cuota numero 6\n'),(11,'2025-06-26',2,6,'MAXIMILIANO ALMONTE',100,4900,'ADMIN','2025-06-26 10:44:44',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(12,'2025-06-26',2,6,'MAXIMILIANO ALMONTE',250,4650,'ADMIN','2025-06-26 10:57:21',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(13,'2025-06-26',2,6,'MAXIMILIANO ALMONTE',450,4200,'ADMIN','2025-06-26 11:02:44',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(14,'2025-06-26',2,6,'MAXIMILIANO ALMONTE',1700,2500,'ADMIN','2025-06-26 11:04:38',_binary '\0',NULL,NULL,'Abono a cuota numero 1\nPago cuota 2 de 4\n'),(15,'2025-06-26',3,11,'BERNALDO GOMEZ',1250,6250,'ADMIN','2025-06-26 11:09:50',_binary '','ADMIN','2025-06-26 11:11:52','Pago cuota 1 de 6\n'),(16,'2025-06-26',3,11,'BERNALDO GOMEZ',500,5750,'ADMIN','2025-06-26 11:10:26',_binary '','ADMIN','2025-06-26 11:11:55','Abono a cuota numero 2\n'),(17,'2025-06-26',3,11,'BERNALDO GOMEZ',0,7500,'ADMIN','2025-06-26 11:17:02',_binary '','ADMIN','2025-06-26 11:17:23','Abono a cuota numero 1\n'),(18,'2025-06-26',3,11,'BERNALDO GOMEZ',1250,6250,'ADMIN','2025-06-26 11:18:02',_binary '\0',NULL,NULL,'Pago cuota 1 de 6\n'),(19,'2025-06-26',3,11,'BERNALDO GOMEZ',750,5500,'ADMIN','2025-06-26 11:19:07',_binary '\0',NULL,NULL,'Abono a cuota numero 2\n'),(20,'2025-06-26',4,4,'Pepe rodriguez',1500,4500,'ADMIN','2025-06-26 11:23:55',_binary '\0',NULL,NULL,'Pago cuota 1 de 6\nAbono a cuota numero 2\n'),(21,'2025-06-26',4,4,'Pepe rodriguez',120,4380,'ADMIN','2025-06-26 14:43:49',_binary '\0',NULL,NULL,'Abono a cuota numero 2\n'),(22,'2025-06-27',4,4,'Pepe rodriguez',4380,0,'ADMIN','2025-06-27 15:39:35',_binary '\0',NULL,NULL,'Abono a cuota numero 2\nPago cuota 3 de 6\nPago cuota 4 de 6\nPago cuota 5 de 6\nPago cuota 6 de 6\n');
+INSERT INTO `recibo_de_ingreso` VALUES (28,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',300,23700,'ADMIN','2025-07-01 14:29:46',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(29,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',2100,21600,'ADMIN','2025-07-01 15:12:11',_binary '','ADMIN','2025-07-01 16:24:06','Abono a cuota numero 1\n'),(30,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',2100,21600,'ADMIN','2025-07-01 16:44:55',_binary '','ADMIN','2025-07-01 16:47:39','Abono a cuota numero 1\n'),(31,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',2100,21600,'ADMIN','2025-07-01 16:47:59',_binary '\0',NULL,NULL,'Abono a cuota numero 1\n'),(32,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',500,21100,'ADMIN','2025-07-01 16:52:54',_binary '\0',NULL,NULL,'Abono a cuota numero 2\n'),(33,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',1900,19200,'ADMIN','2025-07-01 17:01:50',_binary '\0',NULL,NULL,'Abono a cuota numero 2\n'),(34,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',2100,17100,'ADMIN','2025-07-01 17:05:07',_binary '\0',NULL,NULL,'Abono a cuota numero 3\n'),(35,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',100,17000,'ADMIN','2025-07-01 17:09:37',_binary '\0',NULL,NULL,'Abono a cuota numero 3\n'),(36,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',200,16800,'ADMIN','2025-07-01 17:11:07',_binary '','ADMIN','2025-07-01 17:12:28','Abono a cuota numero 3\n'),(37,'2025-07-01',12,1,'JOSEFINA DE LOS RIO',200,16800,'ADMIN','2025-07-01 17:12:52',_binary '\0',NULL,NULL,'Abono a cuota numero 3\n'),(38,'2025-07-02',15,10,'EUGENIO ALMONTE JIMENEZ',1250,1250,'ADMIN','2025-07-02 11:21:19',_binary '\0',NULL,NULL,'Pago cuota 1 de 2\n'),(39,'2025-07-02',15,10,'EUGENIO ALMONTE JIMENEZ',1250,0,'ADMIN','2025-07-02 11:21:55',_binary '\0',NULL,NULL,'Pago cuota 2 de 2\n');
 /*!40000 ALTER TABLE `recibo_de_ingreso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -269,6 +274,129 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'db_prestamo'
 --
+/*!50003 DROP FUNCTION IF EXISTS `F_CAPITAL_COBRADO` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `F_CAPITAL_COBRADO`(p_fecha date) RETURNS double
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE monto_pago DOUBLE DEFAULT 0;
+
+    SELECT  round(SUM(d. monto_capital),4)
+     INTO monto_pago
+    FROM  recibo_de_ingreso o
+    inner join detalle_recibo_de_ingreso d on o.codigo=d.recibo
+    
+    WHERE anulado = false
+      AND month(fecha)=month(p_fecha) ;
+ 
+    RETURN IFNULL(monto_pago, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `F_CAPITAL_PRESTADO` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `F_CAPITAL_PRESTADO`(p_fecha date) RETURNS double
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE monto  DOUBLE DEFAULT 0;
+
+    SELECT  round(SUM(monto_prestado),4)
+     INTO  monto
+     from prestamo p      
+      WHERE anulado = false
+      AND month(fecha_inicio)=month(p_fecha) ;
+ 
+    RETURN IFNULL(monto, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `F_INTERES_COBRADO` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `F_INTERES_COBRADO`(p_fecha date) RETURNS double
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE monto_pago DOUBLE DEFAULT 0;
+
+    SELECT  round(SUM(d. monto_interes),4)
+     INTO monto_pago
+    FROM  recibo_de_ingreso o
+    inner join detalle_recibo_de_ingreso d on o.codigo=d.recibo
+    
+    WHERE anulado = false
+      AND month(fecha)=month(p_fecha) ;
+ 
+    RETURN IFNULL(monto_pago, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `F_INTERES_PAGADO_A_CUOTA` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `F_INTERES_PAGADO_A_CUOTA`(p_prestamo INT, p_cuota INT) RETURNS double
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE monto_pago DOUBLE DEFAULT 0;
+
+    SELECT  round(SUM(d. monto_interes),4)
+  INTO monto_pago
+    FROM  recibo_de_ingreso o
+    inner join detalle_recibo_de_ingreso d on o.codigo=d.recibo
+    
+    WHERE anulado = false
+      AND prestamo = p_prestamo
+      and cuota= p_cuota ;
+
+    RETURN IFNULL(monto_pago, 0);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `F_TOTAL_ABONO` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -342,4 +470,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-28 15:58:17
+-- Dump completed on 2025-07-02 17:53:15
