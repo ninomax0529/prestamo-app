@@ -33,6 +33,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import jakarta.annotation.security.PermitAll;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @Route("prestamos")
 @PageTitle("Gestión de Préstamos")
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@PermitAll
 public class PrestamoView extends VerticalLayout {
 
     @Autowired
