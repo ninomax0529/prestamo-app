@@ -13,8 +13,10 @@ package com.maxsoft.application.views.login;
 import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import jakarta.annotation.security.PermitAll;
 
 @Route("/login")
+@PermitAll
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginOverlay loginForm = new LoginOverlay();

@@ -25,20 +25,17 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Configura rutas públicas si las necesitas
-        super.configure(http);
-//
-//        System.out.println("http "+http);
-//        UI ui = UI.getCurrent();
-//        if (ui != null) {
-//
-//            http.logout(logout -> logout
-//                    //                .logoutUrl("/logout")
-//                    .logoutSuccessUrl("/login")
-//            );
-//
-//        }
+        // Configura el logout
+        http.logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/login?logout")
+            .invalidateHttpSession(true)
+            .deleteCookies("JSESSIONID")
+            .permitAll()
+        );
 
+        // Llama a la configuración por defecto de Vaadin
+        super.configure(http);
         setLoginView(http, LoginView.class);
     }
 
@@ -53,4 +50,6 @@ public class SecurityConfig extends VaadinWebSecurity {
 
         return new InMemoryUserDetailsManager(user);
     }
+    
+    
 }
