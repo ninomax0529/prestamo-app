@@ -23,6 +23,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.Date;
@@ -33,6 +34,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Reporte Prestamo")
 @Route("/rptPrestamo")
+@AnonymousAllowed()
 @Menu(order = 4, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class ReportPrestamoView extends VerticalLayout {
 

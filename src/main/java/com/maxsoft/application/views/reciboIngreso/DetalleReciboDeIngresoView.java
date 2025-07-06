@@ -26,7 +26,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.time.LocalDate;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 /**
@@ -35,6 +35,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  */
 @Route("/detalleRecibo")
 @PageTitle("Detalle Recibo")
+@AnonymousAllowed()
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class DetalleReciboDeIngresoView extends VerticalLayout implements HasUrlParameter<String> {
 

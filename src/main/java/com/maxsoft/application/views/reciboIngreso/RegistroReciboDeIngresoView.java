@@ -48,8 +48,6 @@ import java.util.List;
 import com.vaadin.flow.router.Route;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Set;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @Route(value = "/registroRecibos")

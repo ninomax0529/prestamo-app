@@ -40,6 +40,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  */
 @Route("/registroPrestamos")
 @PageTitle("Gestión de Préstamos")
+@AnonymousAllowed()
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class RegistroPrestamoView extends VerticalLayout implements HasUrlParameter<String> {
 

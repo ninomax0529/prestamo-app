@@ -20,10 +20,10 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginOverlay loginForm = new LoginOverlay();
 
     public LoginView() {
-        loginForm.setTitle("Sistema de Gestion");
-        loginForm.setDescription("App SGC");
+        loginForm.setTitle("Prestamo");
+        loginForm.setDescription("App de Prestamo");
         loginForm.setAction("login");
-        loginForm.setOpened(true);
+        loginForm.setOpened(true);       
         add(loginForm);
         setAlignItems(Alignment.CENTER
         

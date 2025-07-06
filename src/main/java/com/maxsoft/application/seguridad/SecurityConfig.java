@@ -40,8 +40,10 @@ public class SecurityConfig extends VaadinWebSecurity {
         // Usuario en memoria (puedes usar JDBC o JPA si deseas)
         UserDetails user = User.withUsername("admin")
                 .password("{noop}123") // {noop} evita codificación
-                .roles("ADMIN")
+                .roles("ADMIN")                
                 .build();
+        
+       
 
         return new InMemoryUserDetailsManager(user);
     }
