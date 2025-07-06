@@ -10,6 +10,7 @@ package com.maxsoft.application.seguridad;
  */
 //import com.cc.application.views.login.LoginView;
 import com.maxsoft.application.views.login.LoginView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,24 +27,29 @@ public class SecurityConfig extends VaadinWebSecurity {
     protected void configure(HttpSecurity http) throws Exception {
         // Configura rutas públicas si las necesitas
         super.configure(http);
+//
+//        System.out.println("http "+http);
+//        UI ui = UI.getCurrent();
+//        if (ui != null) {
+//
+//            http.logout(logout -> logout
+//                    //                .logoutUrl("/logout")
+//                    .logoutSuccessUrl("/login")
+//            );
+//
+//        }
 
-//           http.logout(logout -> logout
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/login")
-//                );
-           
         setLoginView(http, LoginView.class);
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         // Usuario en memoria (puedes usar JDBC o JPA si deseas)
+
         UserDetails user = User.withUsername("admin")
                 .password("{noop}123") // {noop} evita codificación
-                .roles("ADMIN")                
+                .roles("ADMIN")
                 .build();
-        
-       
 
         return new InMemoryUserDetailsManager(user);
     }

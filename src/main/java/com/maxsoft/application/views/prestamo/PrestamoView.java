@@ -49,7 +49,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @Route("prestamos")
 @PageTitle("Gestión de Préstamos")
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-@RolesAllowed("ADMIN")
+@PermitAll
 //@PermitAll
 public class PrestamoView extends VerticalLayout {
 
