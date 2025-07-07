@@ -13,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import jakarta.annotation.security.PermitAll;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  *
  * @author Maximiliano
  */
+@PermitAll
 public class PrestamoDialog extends Dialog {
 
     private final Grid<Prestamo> grid = new Grid<>(Prestamo.class, false);

@@ -50,10 +50,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+@PermitAll
 @Route(value = "/registroRecibos")
 @PageTitle("Regsitro Recibos de Ingreso")
-@Menu(order = 3, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-@PermitAll
+
 public class RegistroReciboDeIngresoView extends VerticalLayout implements HasUrlParameter<String> {
 
     private final ReciboDeIngresoService reciboService;

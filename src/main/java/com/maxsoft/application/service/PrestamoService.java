@@ -19,6 +19,7 @@ public interface PrestamoService {
     Prestamo getPrestamo(int obj);
 
     List<Prestamo> getLista();
+
     List<Prestamo> getPrestamoSaldado();
 
     List<Prestamo> getPrestamoPendiente();
@@ -36,6 +37,8 @@ public interface PrestamoService {
     Double getMontoPendienteCuota(int codPrestamo, int codCuota);
 
     Double getMontoPagadoCuota(int codPrestamo, int codCuota);
-    
+
     Double getInteresPagadoCuota(int codPrestamo, int codCuota);
+
+    List<Prestamo> ejecutarConsultaDinamica(String jpql);
 }

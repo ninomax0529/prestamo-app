@@ -15,8 +15,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.PermitAll;
 
-@Route("/login")
 @PermitAll
+@Route("/login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private final LoginOverlay loginForm = new LoginOverlay();

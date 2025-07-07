@@ -48,10 +48,10 @@ import java.sql.Connection;
 import javax.sql.DataSource;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+@PermitAll
 @Route(value = "recibos")
 @PageTitle("Recibos de Ingreso")
-@Menu(order = 3, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-@PermitAll
+@Menu(order = 3)
 public class ReciboDeIngresoView extends VerticalLayout {
 
     @Autowired

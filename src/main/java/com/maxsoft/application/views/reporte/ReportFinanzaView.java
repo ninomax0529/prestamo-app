@@ -31,10 +31,10 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+@AnonymousAllowed()
 @PageTitle("Reportes Financiero")
 @Route("/rptFinanza")
-@AnonymousAllowed()
-@Menu(order = 6, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@Menu(order = 7)
 public class ReportFinanzaView extends VerticalLayout {
 
     @Autowired

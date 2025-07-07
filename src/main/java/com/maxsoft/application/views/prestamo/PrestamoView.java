@@ -34,7 +34,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
@@ -46,11 +45,13 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  *
  * @author Maximiliano
  */
+
+
+@PermitAll
 @Route("prestamos")
 @PageTitle("Gestión de Préstamos")
-@Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
-@PermitAll
-//@PermitAll
+@Menu(order = 2)
+
 public class PrestamoView extends VerticalLayout {
 
     @Autowired
@@ -91,8 +92,6 @@ public class PrestamoView extends VerticalLayout {
 
         radioGroup.addValueChangeListener(e -> {
 
-            String seleccion = e.getValue();
-            Notification.show("Seleccionaste: " + seleccion);
             actualizarGrid();
         });
 
@@ -278,6 +277,9 @@ public class PrestamoView extends VerticalLayout {
 
         if (radioGroup.getValue().equalsIgnoreCase("Todos")) {
 
+          List<Prestamo> listaP= prestamoService.ejecutarConsultaDinamica("select * from prestamo where codigo >14 ");
+          
+           listaP.forEach(p->System.out.println("Prestamo "+p.getNombreCliente()));
             grid.setItems(prestamoService.getLista());
 
         } else if (radioGroup.getValue().equalsIgnoreCase("Pendiente")) {

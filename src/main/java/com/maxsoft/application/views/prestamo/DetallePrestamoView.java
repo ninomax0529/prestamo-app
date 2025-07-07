@@ -34,9 +34,9 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  *
  * @author Maximiliano
  */
+@AnonymousAllowed()
 @Route("/detallePrestamo")
 @PageTitle("Detalle Préstamo")
-@AnonymousAllowed()
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class DetallePrestamoView extends VerticalLayout implements HasUrlParameter<String> {
 

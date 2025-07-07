@@ -32,10 +32,10 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+@AnonymousAllowed()
 @PageTitle("Reportes Clientes")
 @Route("/rptCliente")
-@AnonymousAllowed()
-@Menu(order = 6, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@Menu(order = 6)
 public class ReportClienteView extends VerticalLayout {
 
     @Autowired

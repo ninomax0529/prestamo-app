@@ -15,12 +15,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-//@PWA(name = "App de Prestamo", shortName = "AppPrestamo", offlineResources = {})
-// @PWA(
-//    name = "App de Prestamo",
-//    shortName = "AppPrestamo",
-//    offlinePath = "offline.html"
-//)
 @PWA(
     name = "App de Prestamo",
     shortName = "AppPrestamo",

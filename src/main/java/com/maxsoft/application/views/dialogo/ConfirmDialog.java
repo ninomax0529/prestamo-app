@@ -13,7 +13,9 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import jakarta.annotation.security.PermitAll;
 
+@PermitAll
 public class ConfirmDialog extends Dialog {
 
     private final Button confirmButton;

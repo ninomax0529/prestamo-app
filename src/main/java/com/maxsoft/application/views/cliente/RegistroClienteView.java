@@ -29,10 +29,9 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 
+@PermitAll
 @PageTitle("Registro de Clientes")
 @Route("/registroCliente")
-@PermitAll
-//@Menu(order = 0, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class RegistroClienteView extends VerticalLayout implements HasUrlParameter<String> {
 
     private final ClienteService clienteService;

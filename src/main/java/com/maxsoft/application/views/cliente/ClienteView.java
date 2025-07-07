@@ -21,12 +21,12 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
-import org.vaadin.lineawesome.LineAwesomeIconUrl;
+//import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+@PermitAll
 @PageTitle("Clientes")
 @Route("/")
-@PermitAll
-@Menu(order = 0, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@Menu(order = 1)
 public class ClienteView extends VerticalLayout {
 
     private final ClienteService clienteService;

@@ -50,10 +50,10 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  *
  * @author Maximiliano
  */
+@AnonymousAllowed()
 @Route("/registroPrestamos")
 @PageTitle("Gestión de Préstamos")
-@AnonymousAllowed()
-@Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+//@Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class RegistroPrestamoView extends VerticalLayout implements HasUrlParameter<String> {
 
     private final Grid<DetallePrestamo> gridDet = new Grid<>(DetallePrestamo.class, false);

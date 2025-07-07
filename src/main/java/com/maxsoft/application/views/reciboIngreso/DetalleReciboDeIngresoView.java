@@ -33,9 +33,9 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
  *
  * @author Maximiliano
  */
+@AnonymousAllowed()
 @Route("/detalleRecibo")
 @PageTitle("Detalle Recibo")
-@AnonymousAllowed()
 @Menu(order = 2, icon = LineAwesomeIconUrl.GLOBE_SOLID)
 public class DetalleReciboDeIngresoView extends VerticalLayout implements HasUrlParameter<String> {
 

@@ -7,8 +7,13 @@ package com.maxsoft.application.service;
 import com.maxsoft.application.modelo.DetallePrestamo;
 import com.maxsoft.application.modelo.Prestamo;
 import com.maxsoft.application.repo.PrestamoRepo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -112,6 +117,23 @@ public class PrestamoServiceImpl implements PrestamoService {
 
         Double monto = repo.getInteresPagadoCuota(codPrestamo, codCuota);
         return monto == null ? 0.00 : monto;
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<Prestamo> ejecutarConsultaDinamica(String jpql) {
+
+        Query query =  entityManager.createNativeQuery(jpql,Prestamo.class);
+//        TypedQuery<Prestamo> query = entityManager.createNativeQuery(jpql);
+
+//        if (parametros != null) {
+//            for (Map.Entry<String, Object> entry : parametros.entrySet()) {
+//                query.setParameter(entry.getKey(), entry.getValue());
+//            }
+//        }
+
+        return query.getResultList();
     }
 
 }
